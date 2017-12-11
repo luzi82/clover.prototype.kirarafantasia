@@ -19,7 +19,7 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
 
-    output_folder = 'image_recognition'
+    output_folder = os.path.join('image_recognition','screen_sample')
 
     t = int(time.time()*1000)
     output_folder = os.path.join(output_folder,str(t))

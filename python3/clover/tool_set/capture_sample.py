@@ -6,8 +6,9 @@ import sys
 import cv2
 
 FFMPEG_EXEC_PATH = os.path.join('dependency','FFmpeg','ffmpeg')
-MAIN_WIDTH = 213
-MAIN_HEIGHT = 120
+SIZE_FACTOR = 8
+MAIN_WIDTH = 71*SIZE_FACTOR
+MAIN_HEIGHT = 40*SIZE_FACTOR
 
 if __name__ == '__main__':
     import argparse
@@ -18,7 +19,7 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
 
-    output_folder = os.path.join('resource_set','screen_sample_set')
+    output_folder = 'image_recognition'
 
     t = int(time.time()*1000)
     output_folder = os.path.join(output_folder,str(t))

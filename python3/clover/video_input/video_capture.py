@@ -59,6 +59,7 @@ class VideoCapture:
     def _run(self):
         self.proc = subprocess.Popen([
                 self.ffmpeg_exec_path,
+                '-loglevel','panic',
                 '-nostdin',
                 '-f','avfoundation',
                 '-pixel_format','uyvy422',

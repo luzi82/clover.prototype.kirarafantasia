@@ -3,3 +3,4 @@ __pycache__
 .project
 .DS_Store
 calibration.json
+/input

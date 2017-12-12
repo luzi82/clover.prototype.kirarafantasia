@@ -7,12 +7,12 @@ import numpy as np
 from keras.utils import np_utils
 from keras.callbacks import ModelCheckpoint
 import json
-from . import model
+from . import model as model_setting
 from . import classifier
 import clover.common
 
-WIDTH  = model.WIDTH
-HEIGHT = model.HEIGHT
+WIDTH  = model_setting.WIDTH
+HEIGHT = model_setting.HEIGHT
 
 def sample_list_to_data_set(sample_list, label_count):
     fn_list = [ sample['fn'] for sample in sample_list ]
@@ -53,7 +53,7 @@ if __name__ == '__main__':
     label_count = len(label_name_list)
 
     # fast quit if summaryonly
-    model = model.create_model(label_count)
+    model = model_setting.create_model(label_count)
     model.summary()
     if args.summaryonly:
         quit()
@@ -96,7 +96,7 @@ if __name__ == '__main__':
         valid_sample_list = train_valid_sample_list[valid_start:valid_end]
 
         # create model
-        model = model.create_model(label_count)
+        model = model_setting.create_model(label_count)
         model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
             
         train_img_list, train_label_onehot_list = sample_list_to_data_set(train_sample_list,label_count)
@@ -109,7 +109,7 @@ if __name__ == '__main__':
             validation_data=(valid_img_list, valid_label_onehot_list),
             epochs=epochs, batch_size=args.batch_size, callbacks=[checkpointer], verbose=1)
     
-    model = model.create_model(label_count)
+    model = model_setting.create_model(label_count)
     model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
 
     for mirror_idx in range(args.mirror_count):

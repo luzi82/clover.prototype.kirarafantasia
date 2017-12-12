@@ -26,7 +26,7 @@ if __name__ == '__main__':
     
     clr = classifier.StateClassifier(MODEL_PATH)
 
-    fn_list = glob.glob(os.path.join('image_recognition','raw_image','*','*','*.png'))
+    fn_list = glob.glob(os.path.join('image_recognition','screen_sample','*','*','*.png'))
 
     if args.timestamp:
         fn_list = list(filter(lambda v:args.timestamp in v,fn_list))

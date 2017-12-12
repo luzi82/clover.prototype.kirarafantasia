@@ -25,7 +25,7 @@ if __name__ == '__main__':
             image_idx = image_fn[:-4]
             image_idx = int(image_idx)
             image_timestamp=clover.image_recognition.get_timestamp(image_idx)
-            image_ori_path = os.path.join('image_recognition','raw_image',str(image_timestamp),str(int(image_idx/100000)),'{}.png'.format(image_idx))
+            image_ori_path = os.path.join('image_recognition','screen_sample',str(image_timestamp),str(int(image_idx/100000)),'{}.png'.format(image_idx))
             if not os.path.isfile(image_ori_path):
                 print('{} not found'.format(image_ori_path),file=sys.stderr)
                 continue

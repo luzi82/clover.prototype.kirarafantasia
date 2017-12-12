@@ -10,9 +10,6 @@ MODEL_PATH = os.path.join('image_recognition','model','state')
 WEIGHT_FILENAME_FORMAT = 'weight.{}.hdf5'
 DATA_FILENAME   = 'data.json'
 
-IGNORE_STDDEV_MAX = 0.2
-IGNORE_DIFF_MAX   = 1
-
 from . import model
 
 WIDTH  = model.WIDTH

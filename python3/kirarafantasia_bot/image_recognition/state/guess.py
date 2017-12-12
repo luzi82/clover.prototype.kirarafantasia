@@ -51,8 +51,7 @@ if __name__ == '__main__':
         label, _ = clr.get_state(img)
         if (args.disagree) and (label==known_dict[img_fn]):
             continue
-        timestamp = str(clover.image_recognition.get_timestamp(int(img_fn_t[:-4])))
-        out_fn_dir = os.path.join('output',timestamp,label)
+        out_fn_dir = os.path.join('output',label)
         out_fn = os.path.join(out_fn_dir,img_fn_t)
         clover.common.makedirs(out_fn_dir)
         shutil.copyfile( img_fn, out_fn )

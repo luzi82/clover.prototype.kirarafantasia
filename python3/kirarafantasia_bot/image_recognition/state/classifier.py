@@ -10,10 +10,10 @@ MODEL_PATH = os.path.join('image_recognition','model','state')
 WEIGHT_FILENAME_FORMAT = 'weight.{}.hdf5'
 DATA_FILENAME   = 'data.json'
 
-from . import model
+from . import model as model_setting
 
-WIDTH  = model.WIDTH
-HEIGHT = model.HEIGHT
+WIDTH  = model_setting.WIDTH
+HEIGHT = model_setting.HEIGHT
 
 load_img = clover.image_recognition.load_img
 
@@ -37,7 +37,7 @@ class StateClassifier:
         self.model_list = []
         for mirror_idx in range(self.mirror_count):
             weight_path = os.path.join(model_path, WEIGHT_FILENAME_FORMAT.format(mirror_idx))
-            model = model.create_model(self.label_name_count)
+            model = model_setting.create_model(self.label_name_count)
             model.load_weights(weight_path)
             self.model_list.append(model)
 

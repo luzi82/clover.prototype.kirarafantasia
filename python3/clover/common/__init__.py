@@ -17,17 +17,24 @@ def reset_dir(out_dir):
     shutil.rmtree(out_dir,ignore_errors=True)
     os.makedirs(out_dir)
 
-def read_csv(fn,col_name_list):
+def read_csv(fn):
+    col_name_list = None
     ret = []
     with open(fn,'r') as fin:
         for line in csv.reader(fin):
-            assert(len(line)==len(col_name_list))
-            ret.append({col_name_list[i]:line[i] for i in range(len(col_name_list))})
+            if col_name_list is None:
+                col_name_list = list(line)
+            else:
+                assert(len(line)==len(col_name_list))
+                ret.append({col_name_list[i]:line[i] for i in range(len(col_name_list))})
     return ret
 
-def write_csv(fn,v_dict_list,col_name_list,sortkey_func=None):
-    if sortkey_func != None:
-        v_dict_dict = { sortkey_func(v_dict):v_dict for v_dict in v_dict_list }
+def write_csv(fn,v_dict_list,col_name_list=None,sort_key=None):
+    if col_name_list is None:
+        assert(len(v_dict_list)>0)
+        col_name_list = list(sorted(v_dict_list[0].keys()))
+    if sort_key is not None:
+        v_dict_dict = { v_dict[sort_key]:v_dict for v_dict in v_dict_list }
         v_dict_dict_key_sort = sorted(v_dict_dict.keys())
         v_dict_list = [ v_dict_dict[k] for k in v_dict_dict_key_sort ]
     with open(fn,'w') as fout:

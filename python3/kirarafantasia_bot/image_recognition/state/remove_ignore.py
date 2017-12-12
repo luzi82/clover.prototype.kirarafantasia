@@ -1,13 +1,13 @@
 import os
 import clover.common
 import clover.image_recognition
-import bjia_bot.image_recognition.classifier as classifier
+from . import setting
 
 # remove all state input sample which should be ignored
 
 def should_not_ignore(filename):
-    img = classifier.load_img(filename)
-    return not classifier.should_ignore(img)
+    img = clover.image_recognition.load_img(filename)
+    return not setting.should_ignore(img)
 
 if __name__ == '__main__':
     import argparse

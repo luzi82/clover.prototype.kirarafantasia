@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 from functools import lru_cache
 import clover.image_recognition
+from . import setting
 
 MODEL_PATH = os.path.join('image_recognition','model','state')
 WEIGHT_FILENAME_FORMAT = 'weight.{}.hdf5'
@@ -24,14 +25,7 @@ def preprocess_img(img):
     img = np.append(img,clover.image_recognition.xy_layer(WIDTH,HEIGHT),axis=2)
     return img
 
-def should_ignore(img):
-    img_diff = np.max(np.max(img,axis=(0,1))-np.min(img,axis=(0,1)))
-    if img_diff > IGNORE_DIFF_MAX:
-        return False
-    img_stddev = np.max(np.std(img,axis=(0,1)))
-    if img_stddev > IGNORE_STDDEV_MAX:
-        return False
-    return True
+should_ignore = setting.should_ignore
 
 class StateClassifier:
 

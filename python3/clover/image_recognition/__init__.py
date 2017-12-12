@@ -37,11 +37,11 @@ def xy1_layer(w,h):
     return ret
 
 @lru_cache(maxsize=4)
-def get_raw_image_timestamp_list():
-    raw_image_timestamp_list = os.listdir(os.path.join('image_recognition','screen_sample'))
-    raw_image_timestamp_list = filter(lambda v:os.path.isdir(os.path.join('image_recognition','screen_sample',v)),raw_image_timestamp_list)
-    raw_image_timestamp_list = [ int(i) for i in raw_image_timestamp_list ]
-    return raw_image_timestamp_list
+def get_screen_sample_timestamp_list():
+    screen_sample_timestamp_list = os.listdir(os.path.join('image_recognition','screen_sample'))
+    screen_sample_timestamp_list = filter(lambda v:os.path.isdir(os.path.join('image_recognition','screen_sample',v)),screen_sample_timestamp_list)
+    screen_sample_timestamp_list = [ int(i) for i in screen_sample_timestamp_list ]
+    return screen_sample_timestamp_list
 
 def get_timestamp(v):
-    return max(filter(lambda i:i<v,get_raw_image_timestamp_list()))
+    return max(filter(lambda i:i<v,get_screen_sample_timestamp_list()))

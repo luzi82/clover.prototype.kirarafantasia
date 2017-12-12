@@ -29,6 +29,7 @@ def create_model(label_count):
     model.add(Conv2D(filters=256, kernel_size=1, padding='valid', activation='elu'))
     model.add(Conv2D(filters=256, kernel_size=3, padding='valid', activation='elu'))
     model.add(Conv2D(filters=256, kernel_size=1, padding='valid', activation='elu'))
+    model.add(BatchNormalization())
     model.add(MaxPooling2D(pool_size=2))
     model.add(Conv2D(filters=256, kernel_size=1, padding='valid', activation='elu'))
     model.add(Conv2D(filters=256, kernel_size=(1,3), padding='valid', activation='elu'))

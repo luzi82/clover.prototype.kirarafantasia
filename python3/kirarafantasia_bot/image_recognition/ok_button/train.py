@@ -12,6 +12,8 @@ from . import classifier
 import clover.common
 import clover.image_recognition
 
+NAME = model_setting.NAME
+
 INPUT_WH = model_setting.WIDTH,model_setting.HEIGHT
 
 TRAIN_CROP_XYWH   = model_setting.TRAIN_CROP_XYWH
@@ -54,44 +56,33 @@ if __name__ == '__main__':
 
     assert(((args.epochs!=None)and(args.batch_size!=None)and(args.mirror_count!=None))or(args.summaryonly))
 
-    # get label list
-    label_state_path = os.path.join('image_recognition','label','state')
-    label_name_list = os.listdir(label_state_path)
-    label_name_list = filter(lambda v:os.path.isfile(os.path.join(label_state_path,v)),label_name_list)
-    label_name_list = filter(lambda v:v.endswith('.txt'),label_name_list)
-    label_name_list = [ i[:-4] for i in label_name_list]
-    label_name_list = sorted(label_name_list)
-    
-    label_count = len(label_name_list)
-
     # fast quit if summaryonly
-    model = model_setting.create_model(label_count)
+    model = model_setting.create_model()
     model.summary()
     if args.summaryonly:
         quit()
 
     # load sample
-    sample_list = []
-    for label_idx in range(label_count):
-        label_name = label_name_list[label_idx]
-        img_fn_list_fn = os.path.join(label_state_path,'{}.txt'.format(label_name))
-        with open(img_fn_list_fn, mode='rt', encoding='utf-8') as fin:
-            img_fn_list = fin.readlines()
-        img_fn_list = [ img_fn.strip() for img_fn in img_fn_list ]
-        sample_list += [{'fn':img_fn, 'label_idx':label_idx, 'label_name': label_name} for img_fn in img_fn_list ]
+    sample_fn   = 
+    sample_list = clover.common.read_csv(os.path.join(
+        'image_recognition','label',NAME
+    ))
+    
+    # load img
+    img_list, score_list = sample_list_to_data_set(sample_list)
+    sample_list = list(zip(img_list,score_list))
 
     # randomize sample order
-    random.shuffle(sample_list)
+    random.shuffle(img_score_list)
 
     # clean dir
-    clover.common.reset_dir(os.path.join('image_recognition','model','state'))
+    clover.common.reset_dir(os.path.join('image_recognition','model',NAME))
 
     # write data
     j = {
-        'label_name_list': label_name_list,
         'mirror_count':    args.mirror_count
     }
-    with open(os.path.join('image_recognition','model','state','data.json'),'w') as fout:
+    with open(os.path.join('image_recognition','model',NAME,'data.json'),'w') as fout:
         json.dump(j, fp=fout, indent=2, sort_keys=True)
         fout.write('\n')
 
@@ -100,7 +91,7 @@ if __name__ == '__main__':
     train_valid_sample_list = sample_list[test_sample_count:]
 
     for mirror_idx in range(args.mirror_count):
-        hdf5_fn = os.path.join('image_recognition','model','state','weight.{}.hdf5'.format(mirror_idx))
+        hdf5_fn = os.path.join('image_recognition','model',NAME,'weight.{}.hdf5'.format(mirror_idx))
 
         valid_start = int(len(train_valid_sample_list)*(mirror_idx+0)/float(args.mirror_count))
         valid_end   = int(len(train_valid_sample_list)*(mirror_idx+1)/float(args.mirror_count))
@@ -111,8 +102,16 @@ if __name__ == '__main__':
         model = model_setting.create_model(label_count)
         model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
             
-        train_img_list, train_label_onehot_list = sample_list_to_data_set(train_sample_list,label_count)
-        valid_img_list, valid_label_onehot_list = sample_list_to_data_set(valid_sample_list,label_count)
+        # train_img_list, train_label_onehot_list = sample_list_to_data_set(train_sample_list,label_count)
+        # valid_img_list, valid_label_onehot_list = sample_list_to_data_set(valid_sample_list,label_count)
+
+        train_img_list, train_score_list = zip(*train_sample_list)
+        train_img_list = list(train_img_list)
+        train_score_list = list(train_score_list)
+        
+        valid_img_list, valid_score_list = zip(*valid_sample_list)
+        valid_img_list = list(valid_img_list)
+        valid_score_list = list(valid_score_list)
     
         checkpointer = ModelCheckpoint(filepath=hdf5_fn, verbose=1, save_best_only=True)
         
@@ -125,7 +124,7 @@ if __name__ == '__main__':
     model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
 
     for mirror_idx in range(args.mirror_count):
-        hdf5_fn = os.path.join('image_recognition','model','state','weight.{}.hdf5'.format(mirror_idx))
+        hdf5_fn = os.path.join('image_recognition','model',NAME,'weight.{}.hdf5'.format(mirror_idx))
 
         model.load_weights(hdf5_fn)
     

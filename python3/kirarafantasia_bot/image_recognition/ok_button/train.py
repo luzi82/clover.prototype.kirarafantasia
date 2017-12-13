@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
         # create model
         model = model_setting.create_model(label_count)
-        model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
+        model.compile(optimizer='adam', loss='mean_squared_error')
             
         # train_img_list, train_label_onehot_list = sample_list_to_data_set(train_sample_list,label_count)
         # valid_img_list, valid_label_onehot_list = sample_list_to_data_set(valid_sample_list,label_count)
@@ -116,19 +116,23 @@ if __name__ == '__main__':
         checkpointer = ModelCheckpoint(filepath=hdf5_fn, verbose=1, save_best_only=True)
         
         epochs = args.epochs
-        model.fit(train_img_list, train_label_onehot_list,
-            validation_data=(valid_img_list, valid_label_onehot_list),
+        model.fit(train_img_list, train_score_list,
+            validation_data=(valid_img_list, valid_score_list),
             epochs=epochs, batch_size=args.batch_size, callbacks=[checkpointer], verbose=1)
     
     model = model_setting.create_model(label_count)
     model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
 
+    test_img_list,  test_score_list  = zip(*test_sample_list)
+    test_img_list = list(test_img_list)
+    test_score_list = list(test_score_list)
     for mirror_idx in range(args.mirror_count):
         hdf5_fn = os.path.join('image_recognition','model',NAME,'weight.{}.hdf5'.format(mirror_idx))
 
         model.load_weights(hdf5_fn)
-    
-        test_img_list,  test_label_onehot_list  = sample_list_to_data_set(test_sample_list ,label_count)
+        
+        loss = model.test_on_batch(test_img_list)
+        *** NOT FINISH
         test_predictions = [np.argmax(model.predict(np.expand_dims(img_list, axis=0))) for img_list in test_img_list]
         test_accuracy = np.sum(np.array(test_predictions)==np.argmax(test_label_onehot_list, axis=1))/len(test_predictions)
         print('Mirror {0}/{1} test accuracy: {2:.4f}'.format(mirror_idx,args.mirror_count,test_accuracy))

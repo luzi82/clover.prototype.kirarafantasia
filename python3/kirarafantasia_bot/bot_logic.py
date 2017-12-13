@@ -20,8 +20,10 @@ import kirarafantasia_bot.image_recognition.state.classifier as state_classifier
 ##from clover.zookeeper.state_list import title
 
 from kirarafantasia_bot.state_list import z_pause
+from kirarafantasia_bot.state_list import ok_dialog
 from . import bot
 from clover import common
+import shutil
 
 SCREEN_SIZE = bot.SCREEN_SIZE
 VIDEO_SIZE  = bot.VIDEO_SIZE
@@ -41,7 +43,7 @@ class BotLogic:
         #self.state_op_dict['main_menu'] = main_menu
         #self.state_op_dict['mission_boss_invasion'] = _click.Click('mission_boss_invasion',((6+(17/2))*640/120, (144+(11/2))*1136/213),3)
         #self.state_op_dict['no_cp'] = _click.Click('no_cp',btn_xy(21,120,30,13),3)
-        #self.state_op_dict['ok_dialog'] = ok_dialog
+        self.state_op_dict['ok_dialog'] = ok_dialog
         #self.state_op_dict['power_bottle'] = _click.Click('power_bottle',btn_xy(21,124,31,14),3)
         #self.state_op_dict['title'] = _click.Click('mission_boss_invasion',(166+(308/2), 498+(106/2)),3)
 
@@ -81,14 +83,14 @@ class BotLogic:
         state, state_perfect = self.state_clr.get_state(img)
         ret = {
             'state': state,
-            'play': self.play
+            'play': self.play,
+            'add_sample_list': [],
         }
         
         if not state_perfect:
             print('HAVFWEEKPD not perfect: {}'.format(state))
+            ret['add_sample_list'].append(os.path.join('state',state))
         
-        do_cap_screen = do_cap_screen or (not state_perfect)
-
         ticker = None
         if self.play:
             if state in self.state_op_dict:
@@ -101,6 +103,9 @@ class BotLogic:
                 self.last_ticker.end(self,time_s)
             if (ticker!= None)and(hasattr(ticker,'start')):
                 ticker.start(self,time_s)
+
+        if len(ret['add_sample_list'])>0:
+            do_cap_screen = True
 
         good = True
         if (ticker!= None)and(hasattr(ticker,'tick')):
@@ -116,9 +121,16 @@ class BotLogic:
                 t0 = int(t/100000)
                 fn_dir = os.path.join(self.cap_screen_output_folder,str(t0))
                 common.makedirs(fn_dir)
-                fn = os.path.join(fn_dir,'{}.png'.format(t))
+                fn0 = '{}.png'.format(t)
+                fn = os.path.join(fn_dir,fn0)
                 cv2.imwrite(fn,img_cap)
                 self.cap_screen_timeout = time_s + 0.5 + 0.5*random.random()
+                
+                for add_sample in ret['add_sample_list']:
+                    fnn_dir = os.path.join('add_sample',add_sample)
+                    common.makedirs(fnn_dir)
+                    fnn = os.path.join(fnn_dir,fn0)
+                    shutil.copyfile(fn,fnn)
 
         return ret if good else None
 

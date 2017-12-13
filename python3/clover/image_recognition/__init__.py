@@ -46,35 +46,54 @@ def get_screen_sample_timestamp_list():
 def get_timestamp(v):
     return max(filter(lambda i:i<v,get_screen_sample_timestamp_list()))
 
-#def create_bound_box_img_list(img,src_area,size_range,step,dest_size):
-#    bound_box_list = get_bound_box_list(src_area,size_range,step)
-#    img_list = [img_bound_box_scale(img,bound_box,dest_size) for bound_box in bound_box_list]
-#    return bound_box_list, img_list
-#
-## src_area:   area of bound box, (x,y,w,h), w/h would be factor of step
-## size_range: size range of bound box, ((w0,w1),(h0,h1)), should be factor of step
-## step:       base factor, shift step, resize step, (x,y)
-#def get_bound_box_list(src_area,size_range,step):
-#    ax,ay,aw,ah = src_area
-#    ((w0,w1),(h0,h1)) = size_range
-#    step_x,step_y = step
-#
-#    output_list = []
-#    for w,h in [(w,h) for w in range(w0,w1+1,step_x) for h in range(h0,h1+1,step_y)]:
-#        output_list += [(x,y,w,h) for x in range(ax,ax+aw+1,step_x) for y in range(ay,ay+ah+1,step_y)]
-#    
-#    return output_list
-#
-#def img_bound_box_scale(img,bound_box,dest_size):
-#    bx,by,bw,bh = bound_box
-#    dw,dh = dest_size
-#    img = img[by:by+bh][bx:bx+bw]
-#    img = cv2.resize(img,dsize=(dw,dh),interpolation=cv2.INTER_AREA)
-#    return img
+def create_bound_box_img_list(img,bound_box_list,dest_size):
+    img_list = [img_bound_box_scale(img,bound_box,dest_size) for bound_box in bound_box_list]
+    return img_list
+
+# src_area:   area of bound box, (x,y,w,h), w/h would be factor of step
+# size_range: size range of bound box, ((w0,w1),(h0,h1)), should be factor of step
+# step:       base factor, shift step, resize step, (x,y)
+def cal_bound_box_list(src_xywh,size_range_lu_wh,step_xy):
+    ax,ay,aw,ah = src_xywh
+    ((w0,w1),(h0,h1)) = size_range_lu_wh
+    step_x,step_y = step_xy
+
+    output_list = []
+    for w,h in [(w,h) for w in range(w0,w1+1,step_x) for h in range(h0,h1+1,step_y)]:
+        output_list += [(x,y,w,h) for x in range(ax,ax+aw+1-w,step_x) for y in range(ay,ay+ah+1-h,step_y)]
+    
+    return output_list
+
+def img_bound_box_scale(img,bound_box,dest_size):
+    bx,by,bw,bh = bound_box
+    dw,dh = dest_size
+    img = img[by:by+bh][bx:bx+bw]
+    img = cv2.resize(img,dsize=(dw,dh),interpolation=cv2.INTER_AREA)
+    return img
+
+# intercept area / union area, min 0, max 1
+def cal_bound_box_score(bound_box, answer_box):
+    bxl,byl,bxu,byu = xywh_to_xyxy(bound_box)
+    axl,ayl,axu,ayu = xywh_to_xyxy(answer_box)
+    
+    xl = max(bxl,axl)
+    xu = min(bxu,axu)
+    yl = max(byl,ayl)
+    yu = min(byu,ayu)
+    if(xl>=xu):
+        return 0
+    if(yl>=yu):
+        return 0
+    
+    inner_size = (xu-xl)*(yu-yl)
+    a_size = (axu-axl)*(ayu-ayl)
+    b_size = (bxu-bxl)*(byu-byl)
+    
+    return inner_size / (a_size+b_size-inner_size)
 
 def xywh_to_xyxy(xywh):
     return xywh[0],xywh[1],xywh[0]+xywh[2],xywh[1]+xywh[3]
 
-def crop_img(img, xywh):
-    x0,y0,x1,y1 = xywh_to_xyxy(xywh)
-    return img[y0:y1][x0:x1]
+#def crop_img(img, xywh):
+#    x0,y0,x1,y1 = xywh_to_xyxy(xywh)
+#    return img[y0:y1][x0:x1]

@@ -12,49 +12,35 @@ from . import classifier
 import clover.common
 import clover.image_recognition
 
-WIDTH  = model_setting.WIDTH
-HEIGHT = model_setting.HEIGHT
+INPUT_WH = model_setting.WIDTH,model_setting.HEIGHT
 
 TRAIN_CROP_XYWH   = model_setting.TRAIN_CROP_XYWH
-TRAIN_BOUND_WH_LU = model_setting.TRAIN_BOUND_WH_LU
+TRAIN_BOUND_LU_WH = model_setting.TRAIN_BOUND_LU_WH
 TRAIN_STEP_XY     = model_setting.TRAIN_STEP_XY
 
 def sample_list_to_data_set(sample_list):
+    bound_box_list = clover.image_recognition.cal_bound_box_list(TRAIN_CROP_XYWH,TRAIN_BOUND_LU_WH,TRAIN_STEP_XY)
+
     img_list = []
     score_list = []
     
     for sample in sample_list:
-        # load img and bound box
-        fn = sample['fn']
-        img = clover.image_recognition.load_img(fn)
-        xywh = sample['x'],sample['y'],sample['w'],sample['h']
+        sample_img = clover.image_recognition.load_img(sample['fn'])
+        sample_img_list = clover.image_recognition.create_bound_box_img_list(
+            img,bound_box_list,INPUT_WH
+        )
         
-        # crop size
-        img = crop_img(TRAIN_CROP_XYWH)
-        xywh = ( xywh[0]-TRAIN_CROP_XYWH[0],
-                 xywh[1]-TRAIN_CROP_XYWH[1],
-                 xywh[2],xywh[3             )
+        sample_obj_xywh = (sample['x'],sample['y'],sample['w'],sample['h'])
+        sample_score_list = [
+            clover.image_recognition.cal_bound_box_score(bound_box,sample_obj_xywh)
+            for bound_box in bound_box_list
+        ]
         
-        # scale factor
-        new_size = TRAIN_CROP_XYWH[2]/ZOOM_FACTOR_XY[0],TRAIN_CROP_XYWH[3]/ZOOM_FACTOR_XY[1]
-        img = cv2.resize(img,dsize=new_size,interpolation=cv2.INTER_AREA)
-        xywh = ( xywh[0]/ZOOM_FACTOR_XY[0],
-                 xywh[1]/ZOOM_FACTOR_XY[1],
-                 xywh[2]/ZOOM_FACTOR_XY[0],
-                 xywh[3]/ZOOM_FACTOR_XY[1] )
+        assert(len(sample_img_list)==len(sample_score_list))
+        img_list  +=sample_img_list
+        score_list+=sample_score_list
     
-    label_idx_list = np.array([ sample['label_idx'] for sample in sample_list ])
-    label_onehot_list = np_utils.to_categorical(label_idx_list, label_count)
-    return img_list, label_onehot_list
-
-def fn_list_load_img_list(fn_list):
-    img_list = [ fn_load_img_list(fn) for fn in fn_list ]
-    return np.array(img_list)
-
-def fn_load_img_list(fn):
-    img = clover.image_recognition.load_img(fn)
-    #img = model_setting.preprocess_img(img)
-    return img
+    return img_list, score_list
 
 if __name__ == '__main__':
     import argparse

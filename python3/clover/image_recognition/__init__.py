@@ -71,7 +71,7 @@ def img_bound_box_scale(img,bound_box,dest_size):
     img = cv2.resize(img,dsize=(dw,dh),interpolation=cv2.INTER_AREA)
     return img
 
-# intercept area / union area, min 0, max 1
+# (intercept_area/union_area)*2-1, min -1, max 1
 def cal_bound_box_score(bound_box, answer_box):
     bxl,byl,bxu,byu = xywh_to_xyxy(bound_box)
     axl,ayl,axu,ayu = xywh_to_xyxy(answer_box)
@@ -89,7 +89,9 @@ def cal_bound_box_score(bound_box, answer_box):
     a_size = (axu-axl)*(ayu-ayl)
     b_size = (bxu-bxl)*(byu-byl)
     
-    return inner_size / (a_size+b_size-inner_size)
+    ratio = inner_size / (a_size+b_size-inner_size)
+    
+    return ratio*2 - 1
 
 def xywh_to_xyxy(xywh):
     return xywh[0],xywh[1],xywh[0]+xywh[2],xywh[1]+xywh[3]

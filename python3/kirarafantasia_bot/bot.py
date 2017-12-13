@@ -19,6 +19,7 @@ SCREEN_SIZE = 1280, 720
 VIDEO_SIZE = 568, 320
 WHITE = 255,255,255
 #ARM_SPEED = 10000
+LOGIC_VIDEO_OFFSET = 0,VIDEO_SIZE[1]
 
 class Bot:
 
@@ -84,7 +85,7 @@ class Bot:
                 tmp_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                 tmp_img = np.swapaxes(tmp_img,0,1)
                 pygame.pixelcopy.array_to_surface(img_surf,tmp_img)
-                screen.blit(img_surf,(0,VIDEO_SIZE[1]))
+                screen.blit(img_surf,LOGIC_VIDEO_OFFSET)
                 self.logic.draw(screen,self.logic_result_buf[logic_read_idx])
             else:
                 self.logic.draw(screen,None)

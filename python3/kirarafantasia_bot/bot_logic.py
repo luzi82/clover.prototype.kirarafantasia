@@ -27,6 +27,7 @@ import shutil
 
 SCREEN_SIZE = bot.SCREEN_SIZE
 VIDEO_SIZE  = bot.VIDEO_SIZE
+TOUCH_SIZE  = bot.TOUCH_SIZE
 
 class BotLogic:
 
@@ -163,7 +164,7 @@ class BotLogic:
 #        screen.blit(self.state_render_dict[state], (240,0))
 
 def btn_xy(x,y,w,h):
-    return ((x+(w/2))*640/120, (y+(h/2))*1136/213)
+    return ((x+(w/2))*TOUCH_SIZE[0]/VIDEO_SIZE[0], (y+(h/2))*TOUCH_SIZE[1]/VIDEO_SIZE[0])
 
 BTN_SIZE = 30
 def btn_rect(idx):

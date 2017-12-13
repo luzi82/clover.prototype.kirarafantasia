@@ -6,8 +6,11 @@ from collections import deque
 from clover.common import draw_util
 from kirarafantasia_bot import bot_logic as b_logic
 
+TOUCH_SIZE  = b_logic.TOUCH_SIZE
+MIN_TOUCH_SIDE = min(*TOUCH_SIZE)
+
 MY_NAME = 'z_pause'
-BUTTON_XYZ = 320, -100, 0
+BUTTON_XYZ = -MIN_TOUCH_SIDE/4, -MIN_TOUCH_SIDE/4, 0
 
 def init(bot_logic):
     bot_logic.v[MY_NAME] = {}

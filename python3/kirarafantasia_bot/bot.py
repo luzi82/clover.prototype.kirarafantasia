@@ -17,6 +17,7 @@ FFMPEG_EXEC_PATH = os.path.join('dependency','FFmpeg','ffmpeg')
 
 SCREEN_SIZE = 1280, 720
 VIDEO_SIZE = 568, 320
+TOUCH_SIZE = 1136, 640
 WHITE = 255,255,255
 #ARM_SPEED = 10000
 LOGIC_VIDEO_OFFSET = 0,VIDEO_SIZE[1]
@@ -116,7 +117,8 @@ class Bot:
                     self.logic_result_arwj.release_write_idx()
                 if logic_result and 'arm_move_list' in logic_result:
                     for pos in logic_result['arm_move_list']:
-                        self.uarm_screen_last_cmd = self.uarm_screen.set_position(pos,ARM_SPEED)
+                        pos0 = pos_rotate(pos)
+                        self.uarm_screen_last_cmd = self.uarm_screen.set_position(pos0,ARM_SPEED)
                         self.last_pos = list(pos)
         except:
             traceback.print_exc()
@@ -129,6 +131,9 @@ class Bot:
         ret['xyz'] = self.uarm_screen.get_last_report_position()
         ret['last_pos'] = self.last_pos if (self.last_pos!=None) else ret['xyz']
         return ret
+
+def pos_rotate(pos):
+    return 640-pos[1],pos[0]
 
 if __name__ == '__main__':
     import argparse

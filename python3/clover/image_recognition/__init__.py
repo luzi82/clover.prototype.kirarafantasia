@@ -67,7 +67,7 @@ def cal_bound_box_list(src_xywh,size_range_lu_wh,step_xy):
 def img_bound_box_scale(img,bound_box,dest_size):
     bx,by,bw,bh = bound_box
     dw,dh = dest_size
-    img = img[by:by+bh][bx:bx+bw]
+    img = img[by:(by+bh),bx:(bx+bw),:]
     img = cv2.resize(img,dsize=(dw,dh),interpolation=cv2.INTER_AREA)
     return img
 
@@ -96,4 +96,4 @@ def xywh_to_xyxy(xywh):
 
 #def crop_img(img, xywh):
 #    x0,y0,x1,y1 = xywh_to_xyxy(xywh)
-#    return img[y0:y1][x0:x1]
+#    return img[y0:y1][x0:x1][]

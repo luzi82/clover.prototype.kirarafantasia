@@ -4,6 +4,8 @@ from keras.layers import GaussianNoise
 from keras.models import Sequential
 from keras import regularizers
 from clover.common import PHI
+import numpy as np
+import clover.image_recognition
 
 HEIGHT = 32
 WIDTH  = 32

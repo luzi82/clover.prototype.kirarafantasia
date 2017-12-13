@@ -11,6 +11,7 @@ if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser(description='state label util')
+    parser.add_argument('--reset', action='store_true', help='clear and reset')
     args = parser.parse_args()
 
     input_dir = 'input'
@@ -35,10 +36,11 @@ if __name__ == '__main__':
         label_path = os.path.join('image_recognition','label','state','{}.txt'.format(label_name))
 
         path_list_ori = []
-        if os.path.isfile(label_path):
-            with open(label_path, mode='rt', encoding='utf-8') as fin:
-                path_list_ori = fin.readlines()
-            path_list_ori = [ i.strip() for i in path_list_ori ]
+        if not args.reset:
+            if os.path.isfile(label_path):
+                with open(label_path, mode='rt', encoding='utf-8') as fin:
+                    path_list_ori = fin.readlines()
+                path_list_ori = [ i.strip() for i in path_list_ori ]
 
         path_list = path_list + path_list_ori
         path_list = list(set(path_list))

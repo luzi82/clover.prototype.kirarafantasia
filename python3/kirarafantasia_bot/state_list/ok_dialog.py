@@ -9,6 +9,8 @@ from kirarafantasia_bot import bot
 import kirarafantasia_bot.state_list as state_common
 import clover.image_recognition
 
+VIDEO_SIZE  = bot.VIDEO_SIZE
+TOUCH_SIZE  = bot.TOUCH_SIZE
 LOGIC_VIDEO_OFFSET = bot.LOGIC_VIDEO_OFFSET
 
 def init(bot_logic):
@@ -41,10 +43,8 @@ def tick(bot_logic, img, arm, t, ret):
         ret['ok_dialog_xywh'] = btn_xywh
         
         if (score >= 0) and (arm is not None):
-            x = btn_xywh[0]+btn_xywh[2]/2
-            x*=2
-            y = btn_xywh[1]+btn_xywh[3]/2
-            y*=2
+            x = (btn_xywh[0]+btn_xywh[2]/2)*TOUCH_SIZE[0]/VIDEO_SIZE[0]
+            y = (btn_xywh[1]+btn_xywh[3]/2)*TOUCH_SIZE[1]/VIDEO_SIZE[1]
             
             ret['arm_move_list'] = [
                 (arm['xyz'][:2])+(0,),

@@ -14,11 +14,7 @@ from . import model as model_setting
 
 INPUT_WH = model_setting.WIDTH,model_setting.HEIGHT
 
-SCAN_CROP_XYWH   = setting.SCAN_CROP_XYWH
-SCAN_BOUND_LU_WH = setting.SCAN_BOUND_LU_WH
-SCAN_STEP_XY     = setting.SCAN_STEP_XY
-
-BOUND_BOX_LIST = setting.BOUND_BOX_LIST
+BOUND_BOX_LIST = setting.BOUND_BOX_XYWH_LIST
 
 class Classifier:
 
@@ -28,11 +24,12 @@ class Classifier:
             self.data = json.load(fin)
         
         self.mirror_count = self.data['mirror_count']
+        self.label_name_count = len(self.data['label_name_list'])
         
         self.model_list = []
         for mirror_idx in range(self.mirror_count):
             weight_path = os.path.join(model_path, WEIGHT_FILENAME_FORMAT.format(mirror_idx))
-            model = model_setting.create_model()
+            model = model_setting.create_model(self.label_name_count)
             model.load_weights(weight_path)
             self.model_list.append(model)
 
@@ -42,26 +39,26 @@ class Classifier:
         )
         img_list = [ model_setting.preprocess_img(img) for img in img_list ]
         img_list = np.asarray(img_list)
-        score_list_list = np.zeros((self.mirror_count,len(BOUND_BOX_LIST)),np.float32)
+        score_list_list_list = np.zeros((self.mirror_count,len(BOUND_BOX_LIST),self.label_name_count),np.float32)
         for mirror_idx in range(self.mirror_count):
             predict_list_list = self.model_list[mirror_idx].predict(img_list)
-            #assert(predict_list_list.shape==(len(BOUND_BOX_LIST),1))
-            predict_list = np.reshape(predict_list_list,(len(BOUND_BOX_LIST),))
-            score_list_list[mirror_idx] = predict_list
+            assert(predict_list_list.shape==(len(BOUND_BOX_LIST),self.label_name_count))
+            score_list_list_list[mirror_idx] = predict_list_list
 
-        score_min_list = np.amin(score_list_list,axis=0)
-        #assert(score_min_list.shape==(len(BOUND_BOX_LIST),))
-        score_max_list = np.amax(score_list_list,axis=0)
-        #assert(score_max_list.shape==(len(BOUND_BOX_LIST),))
-        score_diff_list = score_max_list - score_min_list
-        score_diff_max  = np.amax(score_diff_list)
+        # cal disagree exist
+        label_idx_list_list = np.argmax(score_list_list_list, axis=2)
+        assert(label_idx_list_list.shape==(self.mirror_count,len(BOUND_BOX_LIST)))
+        label_idx_ptp_list = np.ptp(label_idx_list_list,axis=0)
+        assert(label_idx_ptp_list.shape==(len(BOUND_BOX_LIST),))
+        label_idx_ptp_max  = np.amax(label_idx_ptp_list)
+        
+        # cal output
+        score_list_list = np.sum(score_list_list_list, axis=0)
+        assert(score_list_list.shape==(len(BOUND_BOX_LIST),self.label_name_count))
+        label_idx_list  = np.argmax(score_list_list, axis=1)
+        assert(label_idx_list.shape==(len(BOUND_BOX_LIST),))
 
-        score_avg_list = np.average(score_list_list,axis=0)
-        #assert(score_avg_list.shape==(len(BOUND_BOX_LIST),))
-        score = np.amax(score_avg_list)
-        bb_idx = np.argmax(score_avg_list)
-
-        return BOUND_BOX_LIST[bb_idx], score, score_diff_max
+        return label_idx_list, label_idx_ptp_max<=0, label_idx_ptp_list
 
 if __name__ == '__main__':
     import argparse
@@ -75,4 +72,4 @@ if __name__ == '__main__':
     sc = Classifier(MODEL_PATH)
 
     ret = sc.get(img)
-    print('bound_box={}, score={}, diff_max={}'.format(*ret))
+    print('class={}, perfect={}, diff={}'.format(*ret))

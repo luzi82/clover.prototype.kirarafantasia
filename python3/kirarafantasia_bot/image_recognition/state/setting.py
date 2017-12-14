@@ -1,6 +1,8 @@
 # avoid tensorflow dependency
 import numpy as np
 
+NAME = 'state'
+
 def should_ignore(img):
     IGNORE_STDDEV_MAX = 0.2
     IGNORE_DIFF_MAX   = 1

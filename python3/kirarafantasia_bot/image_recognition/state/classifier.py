@@ -6,7 +6,7 @@ from functools import lru_cache
 import clover.image_recognition
 from . import setting
 
-MODEL_PATH = os.path.join('image_recognition','model','state')
+MODEL_PATH = os.path.join('image_recognition','model',setting.NAME)
 WEIGHT_FILENAME_FORMAT = 'weight.{}.hdf5'
 DATA_FILENAME   = 'data.json'
 

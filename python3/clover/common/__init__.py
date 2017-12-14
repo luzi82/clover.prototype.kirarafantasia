@@ -40,6 +40,7 @@ def write_csv(fn,v_dict_list,col_name_list=None,sort_key=None):
         v_dict_list = [ v_dict_dict[k] for k in v_dict_dict_key_sort ]
     with open(fn,'w') as fout:
         csv_out = csv.writer(fout)
+        csv_out.writerow(col_name_list)
         for v_dict in v_dict_list:
             csv_out.writerow([v_dict[col_name] for col_name in col_name_list])
 

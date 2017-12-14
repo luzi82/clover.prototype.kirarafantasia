@@ -88,7 +88,6 @@ if __name__ == '__main__':
     sample_list = list(zip(img_list,onehot_list))
 
     # randomize sample order
-    sample_list = sample_list[:10]
     random.shuffle(sample_list)
 
     # clean dir

@@ -20,7 +20,7 @@ if __name__ == '__main__':
     csv_path = os.path.join(csv_dir,'sample_list.csv')
     if (not args.reset) and os.path.isfile(csv_path):
         tmp = clover.common.read_csv(csv_path)
-        entry_dict = { (i['fn'],i['idx']):i for i in tmp }
+        entry_dict = { (i['fn'],int(i['idx'])):i for i in tmp }
     else:
         entry_dict = {}
 

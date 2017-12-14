@@ -5,8 +5,9 @@ import pygame
 from collections import deque
 from clover.common import draw_util
 from kirarafantasia_bot import bot_logic as b_logic
+from kirarafantasia_bot import bot
 
-TOUCH_SIZE  = b_logic.TOUCH_SIZE
+TOUCH_SIZE  = bot.TOUCH_SIZE
 MIN_TOUCH_SIDE = min(*TOUCH_SIZE)
 
 MY_NAME = 'z_pause'

@@ -45,20 +45,24 @@ class Classifier:
             assert(predict_list_list.shape==(len(BOUND_BOX_LIST),self.label_name_count))
             score_list_list_list[mirror_idx] = predict_list_list
 
-        # cal disagree exist
+        # cal disagree
         label_idx_list_list = np.argmax(score_list_list_list, axis=2)
         assert(label_idx_list_list.shape==(self.mirror_count,len(BOUND_BOX_LIST)))
         label_idx_ptp_list = np.ptp(label_idx_list_list,axis=0)
         assert(label_idx_ptp_list.shape==(len(BOUND_BOX_LIST),))
         label_idx_ptp_max  = np.amax(label_idx_ptp_list)
         
-        # cal output
-        score_list_list = np.sum(score_list_list_list, axis=0)
+        # cal label
+        score_list_list = np.average(score_list_list_list, axis=0)
         assert(score_list_list.shape==(len(BOUND_BOX_LIST),self.label_name_count))
         label_idx_list  = np.argmax(score_list_list, axis=1)
         assert(label_idx_list.shape==(len(BOUND_BOX_LIST),))
+        label_list = [self.data['label_name_list'][i] for i in label_idx_list]
+        
+        # cal score
+        score_list = np.max(score_list_list, axis=1)
 
-        return label_idx_list, label_idx_ptp_max<=0, label_idx_ptp_list
+        return label_list, score_list, label_idx_ptp_max<=0, label_idx_ptp_list
 
 if __name__ == '__main__':
     import argparse
@@ -72,4 +76,4 @@ if __name__ == '__main__':
     sc = Classifier(MODEL_PATH)
 
     ret = sc.get(img)
-    print('class={}, perfect={}, diff={}'.format(*ret))
+    print('class={}, score_list={}, perfect={}, diff={}'.format(*ret))

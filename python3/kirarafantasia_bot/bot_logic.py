@@ -9,7 +9,6 @@ import cv2
 from clover.common import draw_util
 import kirarafantasia_bot.image_recognition.state.classifier as state_classifier
 #import clover.zookeeper.state_list as state_common
-#from clover.zookeeper.state_list import _click
 #from clover.zookeeper.state_list import battle
 ##from clover.zookeeper.state_list import battle_result
 ##from clover.zookeeper.state_list import boss_henchman_appeared
@@ -21,6 +20,8 @@ import kirarafantasia_bot.image_recognition.state.classifier as state_classifier
 
 from kirarafantasia_bot.state_list import z_pause
 from kirarafantasia_bot.state_list import ok_dialog
+from kirarafantasia_bot.state_list import click
+from kirarafantasia_bot.state_list import gacha_result
 from . import bot
 from clover import common
 import shutil
@@ -44,9 +45,13 @@ class BotLogic:
         #self.state_op_dict['main_menu'] = main_menu
         #self.state_op_dict['mission_boss_invasion'] = _click.Click('mission_boss_invasion',((6+(17/2))*640/120, (144+(11/2))*1136/213),3)
         #self.state_op_dict['no_cp'] = _click.Click('no_cp',btn_xy(21,120,30,13),3)
-        self.state_op_dict['ok_dialog'] = ok_dialog
         #self.state_op_dict['power_bottle'] = _click.Click('power_bottle',btn_xy(21,124,31,14),3)
         #self.state_op_dict['title'] = _click.Click('mission_boss_invasion',(166+(308/2), 498+(106/2)),3)
+
+        self.state_op_dict['center']       = click.Click('center',(TOUCH_SIZE[0]/2,TOUCH_SIZE[1]/2),3)
+        self.state_op_dict['gacha_result'] = gacha_result
+        self.state_op_dict['ok_dialog']    = ok_dialog
+        self.state_op_dict['top_right']    = click.Click('top_right',btn_xy(489,9,70,71),0.5)
 
         self.play = False
         self.cap_screen = False
@@ -105,12 +110,12 @@ class BotLogic:
             if (ticker!= None)and(hasattr(ticker,'start')):
                 ticker.start(self,time_s)
 
-        if len(ret['add_sample_list'])>0:
-            do_cap_screen = True
-
         good = True
         if (ticker!= None)and(hasattr(ticker,'tick')):
             good = ticker.tick(self, img, arm_data, time_s, ret)
+
+        if len(ret['add_sample_list'])>0:
+            do_cap_screen = True
 
         self.last_ticker = ticker
 

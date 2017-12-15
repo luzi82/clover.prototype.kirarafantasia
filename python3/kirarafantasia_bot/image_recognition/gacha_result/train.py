@@ -35,6 +35,8 @@ def sample_list_to_data_set(sample_list, label_list):
     onehot_list = np.zeros((0,len(label_list)),np.float32)
     
     for fn, idx_label_list in fn_idx_label_list_dict.items():
+        if len(idx_label_list) <= 0 :
+            continue
         sample_img = clover.image_recognition.load_img(fn)
         sample_img_list = clover.image_recognition.create_bound_box_img_list(
             sample_img,bound_box_list,INPUT_WH
@@ -42,7 +44,8 @@ def sample_list_to_data_set(sample_list, label_list):
         sample_img_list = [ sample_img_list[ idx_label[0] ] for idx_label in idx_label_list ]
         
         v_label_list = [i[1] for i in idx_label_list]
-        v_onehot_list  = np_utils.to_categorical(v_label_list, len(label_list))
+        v_onehot_list = np_utils.to_categorical(v_label_list, len(label_list))
+        v_onehot_list = np.reshape(v_onehot_list,(len(idx_label_list),len(label_list)))
         
         assert(len(sample_img_list)==len(idx_label_list))
         assert(sample_img_list[0].shape == INPUT_WH+(3,))

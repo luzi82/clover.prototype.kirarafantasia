@@ -45,7 +45,6 @@ def sample_list_to_data_set(sample_list, label_list):
         v_onehot_list  = np_utils.to_categorical(v_label_list, len(label_list))
         
         assert(len(sample_img_list)==len(idx_label_list))
-        #assert(len(sample_img_list)==10) # optional
         assert(sample_img_list[0].shape == INPUT_WH+(3,))
         assert(v_onehot_list.shape==(len(idx_label_list),len(label_list)))
         

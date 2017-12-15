@@ -24,7 +24,7 @@ class Click:
         else:
             if arm is not None:
                 ret['arm_move_list'] = [
-                    (arm['xyz'][:2])+(0,),
+                    (arm['last_pos'][:2])+(0,),
                     self.button_xy+(0,),
                     self.button_xy+(1,),
                     self.button_xy+(0,)

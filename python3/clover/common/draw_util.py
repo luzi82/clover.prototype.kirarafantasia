@@ -3,7 +3,7 @@ import functools
 
 @functools.lru_cache()
 def _font():
-    return pygame.font.SysFont("monospace", 15)
+    return pygame.font.SysFont("monospace", 20)
 
 @functools.lru_cache(maxsize=1024)
 def text(ttext, color):

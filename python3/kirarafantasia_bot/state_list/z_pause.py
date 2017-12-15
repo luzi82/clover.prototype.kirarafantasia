@@ -11,7 +11,7 @@ TOUCH_SIZE  = bot.TOUCH_SIZE
 MIN_TOUCH_SIDE = min(*TOUCH_SIZE)
 
 MY_NAME = 'z_pause'
-BUTTON_XYZ = -MIN_TOUCH_SIDE/4, -MIN_TOUCH_SIDE/4, 0
+BUTTON_XYZ = -MIN_TOUCH_SIDE/4, bot.TOUCH_SIZE[1]/2, 0
 
 def init(bot_logic):
     bot_logic.v[MY_NAME] = {}
@@ -47,7 +47,7 @@ def tick(bot_logic, img, arm, t, ret):
         return True
     else:
         ret['arm_move_list'] = [
-            (arm['xyz'][:2])+(0,),
+            (arm['last_pos'][:2])+(0,),
             BUTTON_XYZ
         ]
         vv['cooldown_0'] = t+3

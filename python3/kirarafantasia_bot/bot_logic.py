@@ -51,7 +51,9 @@ class BotLogic:
         self.state_op_dict['center']       = click.Click('center',(TOUCH_SIZE[0]/2,TOUCH_SIZE[1]/2),3)
         self.state_op_dict['gacha_result'] = gacha_result
         self.state_op_dict['ok_dialog']    = ok_dialog
-        self.state_op_dict['top_right']    = click.Click('top_right',btn_xy(489,9,70,71),0.5)
+        #self.state_op_dict['top_right']    = click.Click('top_right',btn_xy(489,9,70,15),1)
+        self.state_op_dict['top_right']    = click.Click('top_right',btn_xy(489,9+7,70,15+7),0.5)
+        self.state_op_dict['gacha_retry_dialog'] = click.Click('gacha_retry_dialog',btn_xy(181,215,89,23),2)
 
         self.play = False
         self.cap_screen = False
@@ -169,9 +171,9 @@ class BotLogic:
 #        screen.blit(self.state_render_dict[state], (240,0))
 
 def btn_xy(x,y,w,h):
-    return ((x+(w/2))*TOUCH_SIZE[0]/VIDEO_SIZE[0], (y+(h/2))*TOUCH_SIZE[1]/VIDEO_SIZE[0])
+    return ((x+(w/2))*TOUCH_SIZE[0]/VIDEO_SIZE[0], (y+(h/2))*TOUCH_SIZE[1]/VIDEO_SIZE[1])
 
-BTN_SIZE = 30
+BTN_SIZE = 60
 def btn_rect(idx):
      return (SCREEN_SIZE[0]-(BTN_SIZE*(idx+1)),SCREEN_SIZE[1]-BTN_SIZE,SCREEN_SIZE[0]-(BTN_SIZE*idx),SCREEN_SIZE[1])
 PLAY_BTN_RECT = btn_rect(0)

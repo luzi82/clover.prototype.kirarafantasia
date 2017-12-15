@@ -19,7 +19,7 @@ SCREEN_SIZE = 1280, 720
 VIDEO_SIZE = 568, 320
 TOUCH_SIZE = 1136, 640
 WHITE = 255,255,255
-#ARM_SPEED = 10000
+ARM_SPEED = 20000
 LOGIC_VIDEO_OFFSET = 0,VIDEO_SIZE[1]
 
 class Bot:
@@ -118,8 +118,9 @@ class Bot:
                 if logic_result and 'arm_move_list' in logic_result:
                     for pos in logic_result['arm_move_list']:
                         pos0 = pos_rotate(pos)
+                        print('asdfadafdf {} {}'.format(pos,pos0))
                         self.uarm_screen_last_cmd = self.uarm_screen.set_position(pos0,ARM_SPEED)
-                        self.last_pos = list(pos)
+                        self.last_pos = tuple(pos)
         except:
             traceback.print_exc()
 
@@ -128,12 +129,15 @@ class Bot:
             return None
         ret = {}
         ret['is_busy'] = ( self.uarm_screen_last_cmd != None ) and ( self.uarm_screen_last_cmd.is_busy() )
-        ret['xyz'] = self.uarm_screen.get_last_report_position()
-        ret['last_pos'] = self.last_pos if (self.last_pos!=None) else ret['xyz']
+        ret['xyz'] = pos_unrotate(self.uarm_screen.get_last_report_position())
+        ret['last_pos'] = tuple(self.last_pos if (self.last_pos!=None) else ret['xyz'])
         return ret
 
 def pos_rotate(pos):
-    return 640-pos[1],pos[0]
+    return 640-pos[1],pos[0],pos[2]
+
+def pos_unrotate(pos):
+    return pos[1],640-pos[0],pos[2]
 
 if __name__ == '__main__':
     import argparse

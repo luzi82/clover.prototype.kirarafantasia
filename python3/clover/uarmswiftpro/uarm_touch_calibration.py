@@ -64,7 +64,11 @@ class _UArmTouchCalibrationUtil:
         self.arm.set_position(arm_x,arm_y,self.down_z,SPEED).wait()
         self.arm.wait_stop()
         time.sleep(delay)
-        ttd = self.get_touchtracedata()
+        while True:
+            ttd = self.get_touchtracedata()
+            if not ttd['down']:
+                continue
+            break
         self.arm.set_position(arm_x,arm_y,self.up_z,SPEED).wait()
         if not ttd['down']:
             return None

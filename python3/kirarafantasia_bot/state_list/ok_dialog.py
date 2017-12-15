@@ -47,7 +47,7 @@ def tick(bot_logic, img, arm, t, ret):
             y = (btn_xywh[1]+btn_xywh[3]/2)*TOUCH_SIZE[1]/VIDEO_SIZE[1]
             
             ret['arm_move_list'] = [
-                (arm['xyz'][:2])+(0,),
+                (arm['last_pos'][:2])+(0,),
                 (x,y,0),
                 (x,y,1),
                 (x,y,0)

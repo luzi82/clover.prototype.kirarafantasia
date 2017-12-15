@@ -32,10 +32,10 @@ if __name__ == '__main__':
         img_fn_t = img_fn_t[:-4]
         img_ori = cv2.imread(img_fn)
         img = clover.image_recognition.load_img(img_fn)
-        label_list, _, _, non_perfect = clr.get(img)
+        label_list, score_list, _, non_perfect = clr.get(img)
         
         for i in range(len(BOUND_BOX_XYWH_LIST)):
-            if(args.non_perfect) and (non_perfect[i]<=0):
+            if(args.non_perfect) and (non_perfect[i]<=0) and (score_list[i]>=0.75):
                 continue
             label = label_list[i]
             out_fn_dir = os.path.join('output',label)

@@ -39,14 +39,15 @@ def sample_list_to_data_set(sample_list, label_list):
         sample_img_list = clover.image_recognition.create_bound_box_img_list(
             sample_img,bound_box_list,INPUT_WH
         )
+        sample_img_list = [ sample_img_list[ idx_label[0] ] for idx_label in idx_label_list ]
         
         v_label_list = [i[1] for i in idx_label_list]
         v_onehot_list  = np_utils.to_categorical(v_label_list, len(label_list))
         
         assert(len(sample_img_list)==len(idx_label_list))
-        assert(len(sample_img_list)==10) # optional
+        #assert(len(sample_img_list)==10) # optional
         assert(sample_img_list[0].shape == INPUT_WH+(3,))
-        assert(v_onehot_list.shape==(10,len(label_list)))
+        assert(v_onehot_list.shape==(len(idx_label_list),len(label_list)))
         
         img_list   +=sample_img_list
         onehot_list=np.append(onehot_list,v_onehot_list,axis=0)

@@ -45,6 +45,7 @@ def tick(bot_logic, img, arm, t, ret):
 
         ret['gacha_result_label_list'] = label_list
         ret['perfect'] = perfect
+        ret['ptp_list'] = ptp_list
         
         s5count = sum([ 1 if i == 's5' else 0 for i in label_list ])
         bad_count = sum([ 1 if i > 0 else 0 for i in ptp_list ])
@@ -102,4 +103,5 @@ def draw(screen, tick_result):
             screen.blit(draw_util.text(gacha_result_label,(0,0,0)), (x-2,bot.VIDEO_SIZE[1]+y))
             screen.blit(draw_util.text(gacha_result_label,(0,0,0)), (x,bot.VIDEO_SIZE[1]+y+2))
             screen.blit(draw_util.text(gacha_result_label,(0,0,0)), (x,bot.VIDEO_SIZE[1]+y-2))
-            screen.blit(draw_util.text(gacha_result_label,(255,0,0)), (x,bot.VIDEO_SIZE[1]+y))
+            color = (0,255,0) if (tick_result['ptp_list'][i] <= 0) else (255,0,0)
+            screen.blit(draw_util.text(gacha_result_label,color), (x,bot.VIDEO_SIZE[1]+y))

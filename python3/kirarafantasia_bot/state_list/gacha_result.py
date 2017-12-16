@@ -13,6 +13,7 @@ from kirarafantasia_bot import bot
 import kirarafantasia_bot.state_list as state_common
 import clover.image_recognition
 from kirarafantasia_bot.image_recognition.gacha_result import setting as gr_setting
+import copy
 
 NAME = 'gacha_result'
 HISTORY_FILE = 'gacha_result_history.txt'
@@ -82,7 +83,7 @@ def tick(bot_logic, img, arm, t, ret):
             clover.common.appendlines(HISTORY_FILE,[json.dumps(gacha_result)])
             update_stat(gacha_result_stat, gacha_result)
         
-        ret['gacha_result_stat'] = gacha_result_stat
+        ret['gacha_result_stat'] = copy.copy(gacha_result_stat)
 
         add_sample = False
         if not perfect:
@@ -159,9 +160,17 @@ def draw(screen, tick_result):
             color = (0,255,0) if (tick_result['predict_good'][i]>0) else (255,0,0)
             screen.blit(draw_util.text(gacha_result_label,color), (x,bot.VIDEO_SIZE[1]+y))
 
-    if 'gacha_result_stat' in tick_result:
-        gacha_result_stat = tick_result['gacha_result_stat']
 
+def force_draw(bot_logic, screen, tick_result):
+    if NAME not in bot_logic.d:
+        bot_logic.d[NAME] = {}
+        bot_logic.d[NAME]['gacha_result_stat'] = None
+
+    if (tick_result is not None) and ('gacha_result_stat' in tick_result):
+        bot_logic.d[NAME]['gacha_result_stat'] = tick_result['gacha_result_stat']
+
+    gacha_result_stat = bot_logic.d[NAME]['gacha_result_stat']
+    if gacha_result_stat is not None:
         y=60
         single_sum = sum(gacha_result_stat['single'])
         for i in range(len(gacha_result_stat['single'])):
@@ -170,7 +179,7 @@ def draw(screen, tick_result):
             ratio = count*100/single_sum
             screen.blit(draw_util.text('s{0}: {1}, {2:.2f}%'.format(star,count,ratio),(0,0,0)), (bot.VIDEO_SIZE[0], y))
             y+=20
-
+    
         screen.blit(draw_util.text('X: {0}'.format(gacha_result_stat['bad_single']),(0,0,0)), (bot.VIDEO_SIZE[0], y))
         y+=20
         y+=20

@@ -33,7 +33,7 @@ def init(bot_logic):
     bot_logic.v[NAME] = {}
     bot_logic.v[NAME]['last_img_box_list'] = cal_box_list(state_common.DUMMY_IMG)
     bot_logic.v[NAME]['hi'] = -1.1244443326651827
-    bot_logic.v[NAME]['lo'] = -4.57894335851841
+    bot_logic.v[NAME]['lo'] = -4.414975405913796
 
     #gacha_result_stat = clover.common.read_json('gacha_result_stat.json')
     gacha_result_stat = {
@@ -77,7 +77,7 @@ def tick(bot_logic, img, arm, t, ret):
             gacha_result = {
                 'label_list': label_list,
                 'predict_good': predict_good,
-                'time':int(time.time()*1000),
+                'time':int(t*1000),
             }
             clover.common.appendlines(HISTORY_FILE,[json.dumps(gacha_result)])
             update_stat(gacha_result_stat, gacha_result)

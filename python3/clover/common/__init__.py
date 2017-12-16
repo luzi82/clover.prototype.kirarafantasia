@@ -1,6 +1,7 @@
 import os
 import shutil
 import csv
+import json
 
 PHI = (1+5**0.5)/2
 
@@ -54,3 +55,19 @@ def writelines(fn, txt_list):
     with open(fn, mode='wt', encoding='utf-8') as fout:
         for txt in txt_list:
             fout.write('{}\n'.format(txt))
+
+def appendlines(fn, txt_list):
+    with open(fn, mode='at', encoding='utf-8') as fout:
+        for txt in txt_list:
+            fout.write('{}\n'.format(txt))
+
+def read_json(fn):
+    if not os.path.isfile(fn):
+        return None
+    with open(fn,'r') as fin:
+        return json.load(fin)
+
+def write_json(fn,j):
+    with open(fn, 'w') as fout:
+        json.dump(j, fp=fout, indent=2, sort_keys=True)
+        fout.write('\n')

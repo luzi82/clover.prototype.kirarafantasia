@@ -42,6 +42,9 @@ class StateClassifier:
             self.model_list.append(model)
 
     def get_state(self, img):
+        assert(np.amax(img)<=1)
+        assert(np.amin(img)>=-1)
+    
         if should_ignore(img):
             return '_IGNORE', True
         

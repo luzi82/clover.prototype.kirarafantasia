@@ -34,6 +34,9 @@ class Classifier:
             self.model_list.append(model)
 
     def get(self, img):
+        assert(np.amax(img)<=1)
+        assert(np.amin(img)>=-1)
+
         img_list = clover.image_recognition.create_bound_box_img_list(
             img,BOUND_BOX_LIST,INPUT_WH
         )

@@ -101,8 +101,9 @@ def tick(bot_logic, img, arm, t, ret):
         
         s5count = sum([ 1 if i == 's5' else 0 for i in label_list ])
         bad_count = sum([ 1 if i > 0 else 0 for i in ptp_list ])
+        ret['bingo'] = (s5count+bad_count >= 4)
         
-        if (s5count+bad_count < 3) and (arm is not None):
+        if (not ret['bingo']) and (arm is not None):
             btn_xywh = (333,241,89,24)
             x = (btn_xywh[0]+btn_xywh[2]/2)*TOUCH_SIZE[0]/VIDEO_SIZE[0]
             y = (btn_xywh[1]+btn_xywh[3]/2)*TOUCH_SIZE[1]/VIDEO_SIZE[1]
@@ -166,6 +167,8 @@ def force_draw(bot_logic, screen, tick_result):
     if NAME not in bot_logic.d:
         bot_logic.d[NAME] = {}
         bot_logic.d[NAME]['gacha_result_stat'] = None
+        bot_logic.d[NAME]['sound_effect'] = pygame.mixer.Sound(os.path.join('resource_set','tadUPD04.wav'))
+        bot_logic.d[NAME]['alarm_cooldown'] = 0
 
     if (tick_result is not None) and ('gacha_result_stat' in tick_result):
         bot_logic.d[NAME]['gacha_result_stat'] = tick_result['gacha_result_stat']
@@ -198,6 +201,13 @@ def force_draw(bot_logic, screen, tick_result):
         screen.blit(draw_util.text('X: {0}'.format(gacha_result_stat['bad_ten']),(0,0,0)), (bot.VIDEO_SIZE[0], y))
         y+=20
         y+=20
+        
+    if     (tick_result is not None) \
+       and ('bingo' in tick_result) \
+       and (tick_result['bingo']) \
+       and (time.time()>bot_logic.d[NAME]['alarm_cooldown']):
+           bot_logic.d[NAME]['sound_effect'].play()
+           bot_logic.d[NAME]['alarm_cooldown'] = time.time()+15
 
 # check for hardcode
 for _,_,w,h in BOUND_BOX_XYWH_LIST:

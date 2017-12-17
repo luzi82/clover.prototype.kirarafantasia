@@ -64,6 +64,7 @@ class BotLogic:
         self.last_ticker = None
         
         self.v = {}
+        self.d = {}
 
     def init(self):
         self.state_clr = state_classifier.StateClassifier(state_classifier.MODEL_PATH)
@@ -150,6 +151,11 @@ class BotLogic:
             if tick_result['play']:
                 if state in self.state_op_dict:
                     self.state_op_dict[state].draw(screen, tick_result)
+
+        for _, ticker in self.state_op_dict.items():
+            if not hasattr(ticker, 'force_draw'):
+                continue
+            ticker.force_draw(self, screen, tick_result)
 
         if self.play:
             screen.blit(draw_util.text('P',(0,127,0)), PLAY_BTN_RECT[:2])

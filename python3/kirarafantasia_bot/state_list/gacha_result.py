@@ -97,6 +97,7 @@ def tick(bot_logic, img, arm, t, ret):
         ret['gacha_result_label_list'] = label_list
         ret['perfect'] = perfect
         ret['predict_good'] = predict_good
+        ret['draw_screen'] = True
         
         s5count = sum([ 1 if i == 's5' else 0 for i in label_list ])
         bad_count = sum([ 1 if i > 0 else 0 for i in ptp_list ])

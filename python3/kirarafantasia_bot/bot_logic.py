@@ -65,6 +65,9 @@ class BotLogic:
         
         self.v = {}
         self.d = {}
+        
+        self.draw_img_surf = pygame.pixelcopy.make_surface(np.zeros((VIDEO_SIZE[0],VIDEO_SIZE[1],3),dtype=np.uint8))
+        self.draw_tick_result = None
 
     def init(self):
         self.state_clr = state_classifier.StateClassifier(state_classifier.MODEL_PATH)
@@ -144,13 +147,23 @@ class BotLogic:
         return ret if good else None
 
     
-    def draw(self, screen, tick_result):
+    def draw(self, screen, img_surf, tick_result):
         if tick_result != None:
             state = tick_result['state']
             screen.blit(draw_util.text(state,(0,0,0)), (VIDEO_SIZE[0],0))
             if tick_result['play']:
                 if state in self.state_op_dict:
                     self.state_op_dict[state].draw(screen, tick_result)
+
+        if (tick_result is not None) and ('draw_screen' in tick_result) and (tick_result['draw_screen']):
+            self.draw_tick_result = tick_result
+            self.draw_img_surf.blit(img_surf,(0,0))
+        
+        screen.blit(self.draw_img_surf,(0,VIDEO_SIZE[1]))
+        if self.draw_tick_result is not None:
+            state = self.draw_tick_result['state']
+            if state in self.state_op_dict:
+                self.state_op_dict[state].draw(screen, self.draw_tick_result)
 
         for _, ticker in self.state_op_dict.items():
             if not hasattr(ticker, 'force_draw'):

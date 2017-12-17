@@ -80,18 +80,20 @@ class Bot:
             screen.blit(img_surf,(0,0))
 
             logic_read_idx = self.logic_result_arwj.get_read_idx()
+
+            draw_logic_result = None
             if self.logic_result_arwj.get_order_idx(logic_read_idx) != 0:
                 assert(self.logic_result_buf[logic_read_idx] != None)
-                np.copyto(img, self.logic_img_buf[logic_read_idx])
-                tmp_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                tmp_img = np.swapaxes(tmp_img,0,1)
-                pygame.pixelcopy.array_to_surface(img_surf,tmp_img)
-                screen.blit(img_surf,LOGIC_VIDEO_OFFSET)
-                self.logic.draw(screen,self.logic_result_buf[logic_read_idx])
-            else:
-                self.logic.draw(screen,None)
+                draw_logic_result = self.logic_result_buf[logic_read_idx]
+
+            np.copyto(img, self.logic_img_buf[logic_read_idx])
+            tmp_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            tmp_img = np.swapaxes(tmp_img,0,1)
+            pygame.pixelcopy.array_to_surface(img_surf,tmp_img)
+
+            self.logic.draw(screen,img_surf,draw_logic_result)
             self.logic_result_arwj.release_read_idx()
-            
+
             pygame.display.flip()
     
         self.logic_thread.join()

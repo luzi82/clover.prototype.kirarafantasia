@@ -41,6 +41,7 @@ def tick(bot_logic, img, arm, t, ret):
             ret['add_sample_list'].append('ok_dialog')
 
         ret['ok_dialog_xywh'] = btn_xywh
+        ret['draw_screen'] = True
         
         if (score >= 0) and (arm is not None):
             x = (btn_xywh[0]+btn_xywh[2]/2)*TOUCH_SIZE[0]/VIDEO_SIZE[0]

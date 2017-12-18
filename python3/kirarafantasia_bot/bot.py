@@ -136,10 +136,12 @@ class Bot:
         return ret
 
 def pos_rotate(pos):
-    return 640-pos[1],pos[0],pos[2]
+    #return 640-pos[1],pos[0],pos[2]
+    return pos
 
 def pos_unrotate(pos):
-    return pos[1],640-pos[0],pos[2]
+    #return pos[1],640-pos[0],pos[2]
+    return pos
 
 if __name__ == '__main__':
     import argparse

@@ -52,8 +52,9 @@ class BotLogic:
         self.state_op_dict['gacha_result'] = gacha_result
         self.state_op_dict['ok_dialog']    = ok_dialog
         #self.state_op_dict['top_right']    = click.Click('top_right',btn_xy(489,9,70,15),1)
-        self.state_op_dict['top_right']    = click.Click('top_right',btn_xy(489,9+7,70,15+7),0.5)
+        self.state_op_dict['top_right']    = click.Click('top_right',btn_xy(489,9,70,15),2,0.5)
         self.state_op_dict['gacha_retry_dialog'] = click.Click('gacha_retry_dialog',btn_xy(181,215,89,23),2)
+        self.state_op_dict['ios_menu']    = click.Click('top_right',btn_xy(54,488,120,120),2)
 
         self.play = False
         self.cap_screen = False

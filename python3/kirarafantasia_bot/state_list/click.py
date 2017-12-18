@@ -3,10 +3,11 @@ import sys
 
 class Click:
 
-    def __init__(self,name,button_xy,delay):
+    def __init__(self,name,button_xy,delay,period=None):
         self.name = name
         self.button_xy = button_xy
         self.delay = delay
+        self.period = period if period is not None else delay
 
     def init(self,bot_logic):
         bot_logic.v[self.name] = {}
@@ -29,7 +30,7 @@ class Click:
                     self.button_xy+(1,),
                     self.button_xy+(0,)
                 ]
-                vv['cooldown_0'] = t+self.delay
+                vv['cooldown_0'] = t+self.period
             return True
     
     def draw(self,screen, tick_result):

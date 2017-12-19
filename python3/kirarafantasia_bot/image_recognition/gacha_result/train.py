@@ -64,12 +64,11 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='state classifier trainer')
     parser.add_argument('epochs', nargs='?', type=int, help="epochs")
-    parser.add_argument('batch_size', nargs='?', type=int, help="batch_size")
-    parser.add_argument('mirror_count', nargs='?', type=int, help="batch_size")
+    parser.add_argument('mirror_count', nargs='?', type=int, help="mirror count")
     parser.add_argument('--summaryonly', action='store_true', help="summary only")
     args = parser.parse_args()
 
-    assert(((args.epochs!=None)and(args.batch_size!=None)and(args.mirror_count!=None))or(args.summaryonly))
+    assert(((args.epochs!=None)and(args.mirror_count!=None))or(args.summaryonly))
 
     sample_list = clover.common.read_csv(os.path.join(
         'image_recognition','label',NAME,'sample_list.csv'
@@ -116,6 +115,8 @@ if __name__ == '__main__':
         valid_end   = int(len(train_valid_sample_list)*(mirror_idx+1)/float(args.mirror_count))
         train_sample_list = train_valid_sample_list[:valid_start]+train_valid_sample_list[valid_end:]
         valid_sample_list = train_valid_sample_list[valid_start:valid_end]
+        
+        random.shuffle(train_sample_list)
 
         # create model
         model = model_setting.create_model(label_count)
@@ -134,10 +135,13 @@ if __name__ == '__main__':
     
         checkpointer = ModelCheckpoint(filepath=hdf5_fn, verbose=1, save_best_only=True)
         
+        train_turn_count = math.floor(len(train_sample_list)**(1/3))
+        batch_size = math.ceil(len(train_sample_list)/train_turn_count)
+        
         epochs = args.epochs
         model.fit(train_img_list, train_onehot_list,
             validation_data=(valid_img_list, valid_onehot_list),
-            epochs=epochs, batch_size=args.batch_size, callbacks=[checkpointer], verbose=1)
+            epochs=epochs, batch_size=batch_size, callbacks=[checkpointer], verbose=1)
     
     test_img_list,  test_onehot_list  = zip(*test_sample_list)
     test_img_list = np.asarray(list(test_img_list),np.float32)

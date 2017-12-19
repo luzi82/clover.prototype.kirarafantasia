@@ -1,5 +1,3 @@
-image_recognition/screen_sample/1513216441321/15132164/1513216460974.png
-image_recognition/screen_sample/1513216441321/15132164/1513216461101.png
 image_recognition/screen_sample/1513216441321/15132164/1513216461206.png
 image_recognition/screen_sample/1513216441321/15132164/1513216461331.png
 image_recognition/screen_sample/1513216441321/15132164/1513216461475.png

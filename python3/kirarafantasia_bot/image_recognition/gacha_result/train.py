@@ -11,6 +11,7 @@ from . import model as model_setting
 import clover.common
 import clover.image_recognition
 from . import setting
+import math
 
 NAME = setting.NAME
 

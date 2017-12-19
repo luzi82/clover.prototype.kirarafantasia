@@ -7,6 +7,7 @@ from clover.common import draw_util
 from kirarafantasia_bot import bot_logic as b_logic
 from kirarafantasia_bot import bot
 
+VIDEO_SIZE  = bot.VIDEO_SIZE
 TOUCH_SIZE  = bot.TOUCH_SIZE
 MIN_TOUCH_SIDE = min(*TOUCH_SIZE)
 
@@ -23,7 +24,7 @@ def on_event(bot_logic, event):
     vv = bot_logic.v[MY_NAME]
     if event.type == pygame.MOUSEBUTTONUP:
         pos = pygame.mouse.get_pos()
-        if (pos[0] >= 0) and (pos[0] < 120) and (pos[1] >= 0) and (pos[1] < 213):
+        if (pos[0] >= 0) and (pos[0] < VIDEO_SIZE[0]) and (pos[1] >= 0) and (pos[1] < VIDEO_SIZE[1]):
             pos = b_logic.btn_xy(pos[0],pos[1],0,0)
             vv['move_queue'].append(pos+(0,))
             vv['move_queue'].append(pos+(1,))

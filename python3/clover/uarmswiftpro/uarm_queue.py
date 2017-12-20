@@ -64,7 +64,7 @@ class UArmQueue:
 
     def _loop(self):
         try:
-            busy_queue = deque()
+            busy_queue = []
             next_cmd_time = 0 # uarm easy die if cmd go too fast
             while(True):
                 unit = self.cmd_queue.get(block=True)
@@ -72,8 +72,20 @@ class UArmQueue:
                     return
                 if unit['type'] == 'cmd':
                     while len(busy_queue) >= 2:
-                        wait_unit = busy_queue.popleft()
-                        wait_unit['future'].wait()
+                        #wait_unit = busy_queue.popleft()
+                        #wait_unit['future'].wait()
+
+                        pop_idx = None
+                        for i in range(len(busy_queue)):
+                            wait_unit = busy_queue[i]
+                            if not wait_unit['future'].is_busy():
+                                pop_idx = i+1
+                        if pop_idx is None:
+                            time.sleep(0.05)
+                        else:
+                            if pop_idx>0:
+                                printf('RCKTQSNETX cmd skip detected')
+                            busy_queue = busy_queue[pop_idx:]
                     busy_queue.append(unit)
                     now_time = time.time()
                     #printf('URTSGFSDLS now_time:{:.3f}, next_cmd_time:{:.3f}'.format(now_time,next_cmd_time),file=sys.stderr)

@@ -69,6 +69,8 @@ class BotLogic:
         
         self.draw_img_surf = pygame.pixelcopy.make_surface(np.zeros((VIDEO_SIZE[0],VIDEO_SIZE[1],3),dtype=np.uint8))
         self.draw_tick_result = None
+        
+        self.last_state_perfect = None
 
     def init(self):
         self.state_clr = state_classifier.StateClassifier(state_classifier.MODEL_PATH)
@@ -93,16 +95,25 @@ class BotLogic:
         
         img = img.astype('float32')*2/255-1
         
-        state, state_perfect = self.state_clr.get_state(img)
+        best_state, state_perfect = self.state_clr.get_state(img)
+        state = best_state if state_perfect else None
+
         ret = {
+            'state_perfect': state_perfect,
+            'best_state': best_state,
             'state': state,
             'play': self.play,
             'add_sample_list': [],
         }
         
-        if not state_perfect:
-            print('HAVFWEEKPD not perfect: {}'.format(state))
-            ret['add_sample_list'].append(os.path.join('state',state))
+        # store img if non perfect for 5 sec
+        STATE_PERFECT_TIMEOUT = 5
+        if state_perfect:
+            self.last_state_perfect = time_s
+        elif (self.last_state_perfect is not None) and (time_s > self.last_state_perfect+STATE_PERFECT_TIMEOUT):
+            print('HAVFWEEKPD not perfect: {}'.format(state_perfect))
+            self.last_state_perfect = None
+            ret['add_sample_list'].append(os.path.join('state',best_state))
         
         ticker = None
         if self.play:
@@ -151,7 +162,10 @@ class BotLogic:
     def draw(self, screen, img_surf, tick_result):
         if tick_result != None:
             state = tick_result['state']
-            screen.blit(draw_util.text(state,(0,0,0)), (VIDEO_SIZE[0],0))
+            if state is not None:
+                screen.blit(draw_util.text(state,(0,0,0)), (VIDEO_SIZE[0],0))
+            else:
+                screen.blit(draw_util.text('_NONE',(0,0,0)), (VIDEO_SIZE[0],0))
             if tick_result['play']:
                 if state in self.state_op_dict:
                     self.state_op_dict[state].draw(screen, tick_result)

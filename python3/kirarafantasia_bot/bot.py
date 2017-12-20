@@ -48,7 +48,7 @@ class Bot:
 
         pygame.init()
         img_surf = pygame.pixelcopy.make_surface(np.zeros((VIDEO_SIZE[0],VIDEO_SIZE[1],3),dtype=np.uint8))
-        screen = pygame.display.set_mode(SCREEN_SIZE)
+        screen = pygame.display.set_mode(SCREEN_SIZE, pygame.NOFRAME)
 
         self.logic_img_buf = [np.zeros((VIDEO_SIZE[1],VIDEO_SIZE[0],3),dtype=np.uint8) for _ in range(async_read_write_judge.BUFFER_COUNT)]
         self.logic_result_buf = [None] * async_read_write_judge.BUFFER_COUNT

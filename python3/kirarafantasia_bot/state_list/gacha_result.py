@@ -74,7 +74,7 @@ def tick(bot_logic, img, arm, t, ret):
         bot_logic.v[NAME]['last_img_box_list'] = np.copy(now_box_list)
 
         gacha_result_stat = bot_logic.v[NAME]['gacha_result_stat']
-        if log_img_diff > diff_mean:
+        if log_img_diff > -2.75:
             gacha_result = {
                 'label_list': label_list,
                 'predict_good': predict_good,

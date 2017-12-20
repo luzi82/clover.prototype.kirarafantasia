@@ -83,8 +83,8 @@ class UArmQueue:
                         if pop_idx is None:
                             time.sleep(0.05)
                         else:
-                            if pop_idx>0:
-                                printf('RCKTQSNETX cmd skip detected')
+                            if pop_idx>1:
+                                print('RCKTQSNETX cmd skip detected')
                             busy_queue = busy_queue[pop_idx:]
                     busy_queue.append(unit)
                     now_time = time.time()

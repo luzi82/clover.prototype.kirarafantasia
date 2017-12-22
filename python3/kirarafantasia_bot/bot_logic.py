@@ -71,12 +71,15 @@ class BotLogic:
         self.draw_tick_result = None
         
         self.last_state_perfect = None
+        
+        self.init_done = False
 
     def init(self):
         self.state_clr = state_classifier.StateClassifier(state_classifier.MODEL_PATH)
         for _, state_op in self.state_op_dict.items():
             state_op.init(self)
         z_pause.init(self)
+        self.init_done = True
 
     def on_event(self,event):
         if event.type == pygame.MOUSEBUTTONUP:
@@ -160,6 +163,9 @@ class BotLogic:
 
     
     def draw(self, screen, img_surf, tick_result):
+        if not self.init_done:
+            return
+
         if tick_result != None:
             state = tick_result['state']
             if state is not None:

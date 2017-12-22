@@ -163,33 +163,32 @@ class BotLogic:
 
     
     def draw(self, screen, img_surf, tick_result):
-        if not self.init_done:
-            return
+        if self.init_done:
 
-        if tick_result != None:
-            state = tick_result['state']
-            if state is not None:
-                screen.blit(draw_util.text(state,(0,0,0)), (VIDEO_SIZE[0],0))
-            else:
-                screen.blit(draw_util.text('_NONE',(0,0,0)), (VIDEO_SIZE[0],0))
-            if tick_result['play']:
+            if tick_result != None:
+                state = tick_result['state']
+                if state is not None:
+                    screen.blit(draw_util.text(state,(0,0,0)), (VIDEO_SIZE[0],0))
+                else:
+                    screen.blit(draw_util.text('_NONE',(0,0,0)), (VIDEO_SIZE[0],0))
+                if tick_result['play']:
+                    if state in self.state_op_dict:
+                        self.state_op_dict[state].draw(screen, tick_result)
+    
+            if (tick_result is not None) and ('draw_screen' in tick_result) and (tick_result['draw_screen']):
+                self.draw_tick_result = tick_result
+                self.draw_img_surf.blit(img_surf,(0,0))
+            
+            screen.blit(self.draw_img_surf,(0,VIDEO_SIZE[1]))
+            if self.draw_tick_result is not None:
+                state = self.draw_tick_result['state']
                 if state in self.state_op_dict:
-                    self.state_op_dict[state].draw(screen, tick_result)
-
-        if (tick_result is not None) and ('draw_screen' in tick_result) and (tick_result['draw_screen']):
-            self.draw_tick_result = tick_result
-            self.draw_img_surf.blit(img_surf,(0,0))
-        
-        screen.blit(self.draw_img_surf,(0,VIDEO_SIZE[1]))
-        if self.draw_tick_result is not None:
-            state = self.draw_tick_result['state']
-            if state in self.state_op_dict:
-                self.state_op_dict[state].draw(screen, self.draw_tick_result)
-
-        for _, ticker in self.state_op_dict.items():
-            if not hasattr(ticker, 'force_draw'):
-                continue
-            ticker.force_draw(self, screen, tick_result)
+                    self.state_op_dict[state].draw(screen, self.draw_tick_result)
+    
+            for _, ticker in self.state_op_dict.items():
+                if not hasattr(ticker, 'force_draw'):
+                    continue
+                ticker.force_draw(self, screen, tick_result)
 
         if self.play:
             screen.blit(draw_util.text('P',(0,127,0)), PLAY_BTN_RECT[:2])

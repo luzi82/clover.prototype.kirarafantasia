@@ -49,6 +49,10 @@ def init(bot_logic):
             update_stat(gacha_result_stat, gacha_result)
     bot_logic.v[NAME]['gacha_result_stat'] = gacha_result_stat
 
+    bot_logic.d[NAME] = {}
+    bot_logic.d[NAME]['gacha_result_stat'] = copy.copy(gacha_result_stat)
+    bot_logic.d[NAME]['alarm_cooldown'] = 0
+
 def start(bot_logic, t):
     bot_logic.gacha_result_cooldown_0 = t+2
     bot_logic.gacha_result_cooldown_1 = t+99
@@ -164,11 +168,8 @@ def draw(screen, tick_result):
 
 
 def force_draw(bot_logic, screen, tick_result):
-    if NAME not in bot_logic.d:
-        bot_logic.d[NAME] = {}
-        bot_logic.d[NAME]['gacha_result_stat'] = None
+    if 'sound_effect' not in bot_logic.d[NAME]:
         bot_logic.d[NAME]['sound_effect'] = pygame.mixer.Sound(os.path.join('resource_set','tadUPD04.wav'))
-        bot_logic.d[NAME]['alarm_cooldown'] = 0
 
     if (tick_result is not None) and ('gacha_result_stat' in tick_result):
         bot_logic.d[NAME]['gacha_result_stat'] = tick_result['gacha_result_stat']

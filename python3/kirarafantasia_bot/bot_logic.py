@@ -71,12 +71,15 @@ class BotLogic:
         self.draw_tick_result = None
         
         self.last_state_perfect = None
+        
+        self.init_done = False
 
     def init(self):
         self.state_clr = state_classifier.StateClassifier(state_classifier.MODEL_PATH)
         for _, state_op in self.state_op_dict.items():
             state_op.init(self)
         z_pause.init(self)
+        self.init_done = True
 
     def on_event(self,event):
         if event.type == pygame.MOUSEBUTTONUP:
@@ -160,30 +163,32 @@ class BotLogic:
 
     
     def draw(self, screen, img_surf, tick_result):
-        if tick_result != None:
-            state = tick_result['state']
-            if state is not None:
-                screen.blit(draw_util.text(state,(0,0,0)), (VIDEO_SIZE[0],0))
-            else:
-                screen.blit(draw_util.text('_NONE',(0,0,0)), (VIDEO_SIZE[0],0))
-            if tick_result['play']:
+        if self.init_done:
+
+            if tick_result != None:
+                state = tick_result['state']
+                if state is not None:
+                    screen.blit(draw_util.text(state,(0,0,0)), (VIDEO_SIZE[0],0))
+                else:
+                    screen.blit(draw_util.text('_NONE',(0,0,0)), (VIDEO_SIZE[0],0))
+                if tick_result['play']:
+                    if state in self.state_op_dict:
+                        self.state_op_dict[state].draw(screen, tick_result)
+    
+            if (tick_result is not None) and ('draw_screen' in tick_result) and (tick_result['draw_screen']):
+                self.draw_tick_result = tick_result
+                self.draw_img_surf.blit(img_surf,(0,0))
+            
+            screen.blit(self.draw_img_surf,(0,VIDEO_SIZE[1]))
+            if self.draw_tick_result is not None:
+                state = self.draw_tick_result['state']
                 if state in self.state_op_dict:
-                    self.state_op_dict[state].draw(screen, tick_result)
-
-        if (tick_result is not None) and ('draw_screen' in tick_result) and (tick_result['draw_screen']):
-            self.draw_tick_result = tick_result
-            self.draw_img_surf.blit(img_surf,(0,0))
-        
-        screen.blit(self.draw_img_surf,(0,VIDEO_SIZE[1]))
-        if self.draw_tick_result is not None:
-            state = self.draw_tick_result['state']
-            if state in self.state_op_dict:
-                self.state_op_dict[state].draw(screen, self.draw_tick_result)
-
-        for _, ticker in self.state_op_dict.items():
-            if not hasattr(ticker, 'force_draw'):
-                continue
-            ticker.force_draw(self, screen, tick_result)
+                    self.state_op_dict[state].draw(screen, self.draw_tick_result)
+    
+            for _, ticker in self.state_op_dict.items():
+                if not hasattr(ticker, 'force_draw'):
+                    continue
+                ticker.force_draw(self, screen, tick_result)
 
         if self.play:
             screen.blit(draw_util.text('P',(0,127,0)), PLAY_BTN_RECT[:2])

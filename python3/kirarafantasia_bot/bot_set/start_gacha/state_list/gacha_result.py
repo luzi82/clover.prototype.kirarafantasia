@@ -179,10 +179,11 @@ def force_draw(bot_logic, screen, tick_result):
         y=60
         single_sum = sum(gacha_result_stat['single'])
         for i in range(len(gacha_result_stat['single'])):
-            star = 3+i
-            count = gacha_result_stat['single'][i]
-            ratio = count*100/single_sum
-            screen.blit(draw_util.text('s{0}: {1}, {2:.2f}%'.format(star,count,ratio),(0,0,0)), (bot.VIDEO_SIZE[0], y))
+            if single_sum > 0:
+                star = 3+i
+                count = gacha_result_stat['single'][i]
+                ratio = count*100/single_sum
+                screen.blit(draw_util.text('s{0}: {1}, {2:.2f}%'.format(star,count,ratio),(0,0,0)), (bot.VIDEO_SIZE[0], y))
             y+=20
     
         screen.blit(draw_util.text('X: {0}'.format(gacha_result_stat['bad_single']),(0,0,0)), (bot.VIDEO_SIZE[0], y))

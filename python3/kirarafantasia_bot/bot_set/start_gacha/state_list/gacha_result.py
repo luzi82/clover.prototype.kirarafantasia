@@ -54,7 +54,7 @@ def init(bot_logic):
     bot_logic.d[NAME]['alarm_cooldown'] = 0
 
 def start(bot_logic, t):
-    bot_logic.gacha_result_cooldown_0 = t+2
+    bot_logic.gacha_result_cooldown_0 = t+2.5
     bot_logic.gacha_result_cooldown_1 = t+99
     bot_logic.gacha_result_cooldown_2 = t+999
 

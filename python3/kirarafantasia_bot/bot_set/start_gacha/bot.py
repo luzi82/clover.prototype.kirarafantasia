@@ -12,12 +12,13 @@ from . import bot_logic
 import traceback
 from clover.common import async_read_write_judge
 from clover.uarmswiftpro import uarm_screen
+import kirarafantasia_bot
 
 FFMPEG_EXEC_PATH = os.path.join('dependency','FFmpeg','ffmpeg')
 
 SCREEN_SIZE = 1280, 720
-VIDEO_SIZE = 568, 320
-TOUCH_SIZE = 1136, 640
+VIDEO_SIZE = kirarafantasia_bot.VIDEO_SIZE
+TOUCH_SIZE = kirarafantasia_bot.TOUCH_SIZE
 WHITE = 255,255,255
 ARM_SPEED = 20000
 LOGIC_VIDEO_OFFSET = 0,VIDEO_SIZE[1]

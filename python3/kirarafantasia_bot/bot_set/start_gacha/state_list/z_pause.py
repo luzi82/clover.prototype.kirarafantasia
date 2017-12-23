@@ -4,15 +4,14 @@ import pygame
 
 from collections import deque
 from clover.common import draw_util
-from kirarafantasia_bot import bot_logic as b_logic
-from kirarafantasia_bot import bot
+import kirarafantasia_bot as kbot
 
-VIDEO_SIZE  = bot.VIDEO_SIZE
-TOUCH_SIZE  = bot.TOUCH_SIZE
+VIDEO_SIZE  = kbot.VIDEO_SIZE
+TOUCH_SIZE  = kbot.TOUCH_SIZE
 MIN_TOUCH_SIDE = min(*TOUCH_SIZE)
 
 MY_NAME = 'z_pause'
-BUTTON_XYZ = -MIN_TOUCH_SIDE/4, bot.TOUCH_SIZE[1]/2, 0
+BUTTON_XYZ = -MIN_TOUCH_SIDE/4, kbot.TOUCH_SIZE[1]/2, 0
 
 def init(bot_logic):
     bot_logic.v[MY_NAME] = {}
@@ -25,7 +24,7 @@ def on_event(bot_logic, event):
     if event.type == pygame.MOUSEBUTTONUP:
         pos = pygame.mouse.get_pos()
         if (pos[0] >= 0) and (pos[0] < VIDEO_SIZE[0]) and (pos[1] >= 0) and (pos[1] < VIDEO_SIZE[1]):
-            pos = b_logic.btn_xy(pos[0],pos[1],0,0)
+            pos = kbot.btn_xy(pos[0],pos[1],0,0)
             vv['move_queue'].append(pos+(0,))
             vv['move_queue'].append(pos+(1,))
             vv['move_queue'].append(pos+(0,))

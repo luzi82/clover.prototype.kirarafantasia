@@ -18,13 +18,14 @@ import kirarafantasia_bot.image_recognition.state.classifier as state_classifier
 #from clover.zookeeper.state_list import ok_dialog
 ##from clover.zookeeper.state_list import title
 
-from kirarafantasia_bot.state_list import z_pause
-from kirarafantasia_bot.state_list import ok_dialog
-from kirarafantasia_bot.state_list import click
-from kirarafantasia_bot.state_list import gacha_result
+from kirarafantasia_bot.bot_set.start_gacha.state_list import z_pause
+from kirarafantasia_bot.bot_set.start_gacha.state_list import ok_dialog
+from kirarafantasia_bot.bot_set.start_gacha.state_list import click
+from kirarafantasia_bot.bot_set.start_gacha.state_list import gacha_result
 from . import bot
 from clover import common
 import shutil
+import kirarafantasia_bot as kbot
 
 SCREEN_SIZE = bot.SCREEN_SIZE
 VIDEO_SIZE  = bot.VIDEO_SIZE
@@ -209,8 +210,7 @@ class BotLogic:
 #            self.state_render_dict[state] = self.state_render_font.render(state, 1, (0,0,0))
 #        screen.blit(self.state_render_dict[state], (240,0))
 
-def btn_xy(x,y,w,h):
-    return ((x+(w/2))*TOUCH_SIZE[0]/VIDEO_SIZE[0], (y+(h/2))*TOUCH_SIZE[1]/VIDEO_SIZE[1])
+btn_xy = kbot.btn_xy
 
 BTN_SIZE = 60
 def btn_rect(idx):

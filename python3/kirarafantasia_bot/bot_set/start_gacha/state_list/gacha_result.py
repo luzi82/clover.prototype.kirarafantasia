@@ -9,8 +9,8 @@ import time
 from kirarafantasia_bot.image_recognition.gacha_result import classifier as gr_clr
 from clover.common import draw_util
 import clover.common
-from kirarafantasia_bot import bot
-import kirarafantasia_bot.state_list as state_common
+from kirarafantasia_bot.bot_set.start_gacha import bot
+import kirarafantasia_bot.bot_set.start_gacha.state_list as state_common
 import clover.image_recognition
 from kirarafantasia_bot.image_recognition.gacha_result import setting as gr_setting
 import copy

@@ -5,8 +5,8 @@ import pygame
 
 from kirarafantasia_bot.image_recognition.ok_button import classifier as ok_btn_clr
 from clover.common import draw_util
-from kirarafantasia_bot import bot
-import kirarafantasia_bot.state_list as state_common
+from kirarafantasia_bot.bot_set.start_gacha import bot
+import kirarafantasia_bot.bot_set.start_gacha.state_list as state_common
 import clover.image_recognition
 
 VIDEO_SIZE  = bot.VIDEO_SIZE

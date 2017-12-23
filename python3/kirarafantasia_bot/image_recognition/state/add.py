@@ -23,7 +23,7 @@ if __name__ == '__main__':
     label_name_list = filter(lambda v:v.endswith('.txt'),label_name_list)
     label_name_list = [ i[:-4] for i in label_name_list]
     label_name_list = set(label_name_list)
-    label_name_list = label_name_list | set([i for i in os.listdir(INPUT_DIR) if os.path.isdir(i)])
+    label_name_list = label_name_list | set([i for i in os.listdir(INPUT_DIR) if os.path.isdir(os.path.join(INPUT_DIR,i))])
     label_name_list = sorted(list(label_name_list))
     
     # read old label

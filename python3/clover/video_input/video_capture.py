@@ -9,7 +9,7 @@ import numpy as np
 import cv2
 from clover.common import async_read_write_judge
 
-BUFFER_COUNT = 3
+BUFFER_COUNT = async_read_write_judge.BUFFER_COUNT
 
 class VideoCapture:
 
@@ -19,10 +19,8 @@ class VideoCapture:
         self.width = width
         self.height = height
         self.lock = threading.Lock()
-        #self.read_lock = None
-        #self.write_lock = None
-        #self.next_frame_idx = 1
-        #self.timestamp_list = [0] * BUFFER_COUNT
+        self.done_frame_idx = 0
+        self.frame_idx_buf = [0] * BUFFER_COUNT
         self.arwj = async_read_write_judge.AsyncReadWriteJudge(self.lock)
         self.closing = False
         self.data_ready = False
@@ -30,6 +28,7 @@ class VideoCapture:
         self.buffer = [ bytearray(self.width*self.height*4) for _ in range(BUFFER_COUNT) ]
         nd_list = [ np.frombuffer(b, np.uint8) for b in self.buffer ]
         self.buffer_nd_list = [ np.reshape(nd,(self.height,self.width,4))[:,:,:3] for nd in nd_list ]
+        self.timestamp_buf = [0] * BUFFER_COUNT
     
     def start(self):
         self.thread = threading.Thread( target=self._run )
@@ -39,18 +38,35 @@ class VideoCapture:
         while(True):
             with self.lock:
                 if self.data_ready:
-                    return
+                    return True
+                if self.closing:
+                    return False
             time.sleep(0.1)
 
     def close(self):
-        self.closing = True
-        if self.proc:
-            self.proc.wait()
+        with self.lock:
+            self.closing = True
+        self._kill_proc()
+        self.thread.join()
+
+    def wait_next_frame(self, last_frame_idx, timeout=1):
+        timeout = time.time()+timeout
+        while time.time()<timeout:
+            with self.lock:
+                if self.closing:
+                    return 'CLOSING'
+                if self.done_frame_idx > last_frame_idx:
+                    return 'READY'
+            time.sleep(0.1)
+        return 'TIMEOUT'
 
     def get_frame(self):
+        with self.lock:
+            if self.closing:
+                return 0, None
         #idx = self._get_read_buf_idx()
         idx = self.arwj.get_read_idx()
-        return self.buffer_nd_list[idx]
+        return self.frame_idx_buf[idx], self.timestamp_buf[idx], self.buffer_nd_list[idx]
 
     def release_frame(self):
         self.arwj.release_read_idx()
@@ -74,68 +90,41 @@ class VideoCapture:
             stderr=subprocess.DEVNULL,
             stdout=subprocess.PIPE
         )
-        while (not self.closing):
-            #buf = self._get_write_buf()
+        while (True):
+            with self.lock:
+                if self.closing:
+                    break
             buf_idx = self.arwj.get_write_idx()
             buf = self.buffer[buf_idx]
             llen = self.proc.stdout.readinto(buf)
             if llen!=len(buf):
                 print('llen!=len(buf), llen={}'.format(llen),file=sys.stderr)
+                with self.lock:
+                    self.closing = True
+                self._kill_proc()
                 assert(False)
             #self._release_write_buf()
+            self.done_frame_idx += 1
+            self.frame_idx_buf[buf_idx] = self.done_frame_idx
+            self.timestamp_buf[buf_idx] = time.time()
             self.arwj.release_write_idx()
             with self.lock:
                 self.data_ready = True
         #print('terminate',file=sys.stderr)
-        self.proc.terminate()
-        timeout = time.time() + 5
-        while(time.time()<timeout):
-            if self.proc.returncode != None:
-                return
-            time.sleep(0.1)
-        #print('kill',file=sys.stderr)
-        self.proc.kill()
+        self._kill_proc()
 
-#    def _get_write_buf(self):
-#        with self.lock:
-#            assert(self.write_lock == None)
-#            tmp_timestamp_list = copy.copy(self.timestamp_list)
-#            if self.read_lock != None:
-#                tmp_timestamp_list[self.read_lock] = sys.float_info.max
-#            idx = tmp_timestamp_list.index(min(tmp_timestamp_list))
-#            self.write_lock = idx
-#            self.timestamp_list[idx] = self.next_frame_idx
-#            self.next_frame_idx += 1
-#            return self.buffer[idx]
-#
-#    def _release_write_buf(self):
-#        with self.lock:
-#            assert(self.write_lock != None)
-#            self.write_lock = None
-#
-#    def _get_read_buf_idx(self):
-#        with self.lock:
-#            assert(self.read_lock == None)
-#            tmp_timestamp_list = copy.copy(self.timestamp_list)
-#            if self.write_lock != None:
-#                tmp_timestamp_list[self.write_lock] = 0
-#            idx = tmp_timestamp_list.index(max(tmp_timestamp_list))
-#            self.read_lock = idx
-#            #print(str(idx),file=sys.stderr)
-#            return idx
-#
-#    def _release_read_buf(self):
-#        with self.lock:
-#            assert(self.read_lock != None)
-#            self.read_lock = None
+    def _kill_proc(self):
+        with self.lock:
+            if self.proc:
+                self.proc.terminate()
+                timeout = time.time() + 5
+                while(time.time()<timeout):
+                    if self.proc.returncode != None:
+                        return
+                    time.sleep(0.1)
+                #print('kill',file=sys.stderr)
+                self.proc.kill()
 
-#    def _ffmpeg_exec_path(self):
-#        path = __file__
-#        path = os.path.realpath(path)
-#        path = os.path.dirname(path)
-#        path = os.path.join(path,'external','ffmpeg','ffmpeg')
-#        assert(os.path.isfile(path))
-#        return path
 
 if __name__ == '__main__':
     import argparse

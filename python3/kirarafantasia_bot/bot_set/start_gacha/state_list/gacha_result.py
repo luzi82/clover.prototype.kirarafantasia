@@ -104,7 +104,8 @@ def tick(bot_logic, img, arm, t, ret):
         ret['draw_screen'] = True
         
         s5count = sum([ 1 if i == 's5' else 0 for i in label_list ])
-        bad_count = sum([ 1 if i > 0 else 0 for i in ptp_list ])
+        bad_count  = sum([ 1 if i > 0 else 0 for i in ptp_list ])
+        bad_count += sum([ 1 if i == 'bad' else 0 for i in label_list ])
         ret['bingo'] = (s5count+bad_count >= 4)
         
         if (not ret['bingo']) and (arm is not None):
@@ -231,7 +232,7 @@ def update_stat(gacha_result_stat, gacha_result):
 
     ten_s5 = 0
     for i in range(len(label_list)):
-        if predict_good[i]>0:
+        if (predict_good[i]>0) and (label_list[i]!='bad'):
             label_lv = 2 if label_list[i]=='s5' else \
                        2 if label_list[i]=='d5' else \
                        1 if label_list[i]=='s4' else \

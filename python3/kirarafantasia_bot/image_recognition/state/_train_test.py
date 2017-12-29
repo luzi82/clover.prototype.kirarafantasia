@@ -4,11 +4,11 @@ import sys
 import random
 import cv2
 import numpy as np
-#from keras.utils import np_utils
-#from keras.callbacks import ModelCheckpoint
+from keras.utils import np_utils
+from keras.callbacks import ModelCheckpoint
 import json
 from . import model as model_setting
-#from . import classifier
+from . import classifier
 import clover.common
 import math
 import time
@@ -60,4 +60,4 @@ if __name__ == '__main__':
         test_img_list,  test_label_onehot_list  = sample_list_to_data_set(test_sample_list ,label_count)
         test_predictions = [np.argmax(model.predict(np.expand_dims(img_list, axis=0))) for img_list in test_img_list]
         test_accuracy = np.sum(np.array(test_predictions)==np.argmax(test_label_onehot_list, axis=1))/len(test_predictions)
-        print('Mirror {0}/{1} test accuracy: {2:.4f}'.format(mirror_idx,args.mirror_count,test_accuracy))
+        print('Mirror {0}/{1} test accuracy: {2:.4f}'.format(mirror_idx,mirror_count,test_accuracy))

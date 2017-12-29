@@ -175,6 +175,9 @@ class BotLogic:
                 if tick_result['play']:
                     if state in self.state_op_dict:
                         self.state_op_dict[state].draw(screen, tick_result)
+
+            if not tick_result['play']:
+                z_pause.draw(screen, tick_result)
     
             if (tick_result is not None) and ('draw_screen' in tick_result) and (tick_result['draw_screen']):
                 self.draw_tick_result = tick_result

@@ -1,0 +1,5 @@
+image_recognition/screen_sample/1513787772386/15137881/1513788131968.png
+image_recognition/screen_sample/1513787772386/15137881/1513788180254.png
+image_recognition/screen_sample/1513787772386/15137881/1513788181043.png
+image_recognition/screen_sample/1513787772386/15137882/1513788237131.png
+image_recognition/screen_sample/1513787772386/15137883/1513788352343.png

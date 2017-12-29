@@ -5,9 +5,11 @@ import pygame
 from collections import deque
 from clover.common import draw_util
 import kirarafantasia_bot as kbot
-import kirarafantasia_bot.bot_set.start_gacha.bot_logic as b_logic
+#import kirarafantasia_bot.bot_set.start_gacha.bot_logic as b_logic
 import clover.common
+import kirarafantasia_bot.bot_set.start_gacha as thisbot
 
+SCREEN_SIZE = kbot.SCREEN_SIZE
 VIDEO_SIZE  = kbot.VIDEO_SIZE
 TOUCH_SIZE  = kbot.TOUCH_SIZE
 MIN_TOUCH_SIDE = min(*TOUCH_SIZE)
@@ -15,12 +17,12 @@ MIN_TOUCH_SIDE = min(*TOUCH_SIZE)
 MY_NAME = 'z_pause'
 BUTTON_XYZ = -MIN_TOUCH_SIDE/4, kbot.TOUCH_SIZE[1]/2, 0
 
-DRAG_NORTH_BTN_RECT = b_logic.btn_rect(7)
-DRAG_SOUTH_BTN_RECT = b_logic.btn_rect(6)
-DRAG_EAST_BTN_RECT = b_logic.btn_rect(5)
-DRAG_WEST_BTN_RECT = b_logic.btn_rect(4)
-HOME_1_BTN_RECT = b_logic.btn_rect(3)
-HOME_2_BTN_RECT = b_logic.btn_rect(2)
+DRAG_NORTH_BTN_RECT = thisbot.btn_rect(7)
+DRAG_SOUTH_BTN_RECT = thisbot.btn_rect(6)
+DRAG_EAST_BTN_RECT = thisbot.btn_rect(5)
+DRAG_WEST_BTN_RECT = thisbot.btn_rect(4)
+HOME_1_BTN_RECT = thisbot.btn_rect(3)
+HOME_2_BTN_RECT = thisbot.btn_rect(2)
 
 def init(bot_logic):
     bot_logic.v[MY_NAME] = {}

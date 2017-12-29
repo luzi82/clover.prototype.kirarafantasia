@@ -1,11 +1,16 @@
 {
   "label_name_list": [
     "center",
+    "creator",
     "gacha_result",
+    "gacha_result_card",
+    "gacha_result_girl",
     "gacha_retry_dialog",
+    "gacha_start_girl",
     "ios_menu",
     "ok_dialog",
-    "top_right"
+    "title",
+    "wait"
   ],
   "mirror_count": 3
 }

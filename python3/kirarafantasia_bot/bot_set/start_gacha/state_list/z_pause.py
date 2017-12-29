@@ -9,7 +9,7 @@ import kirarafantasia_bot as kbot
 import clover.common
 import kirarafantasia_bot.bot_set.start_gacha as thisbot
 
-SCREEN_SIZE = kbot.SCREEN_SIZE
+#SCREEN_SIZE = kbot.SCREEN_SIZE
 VIDEO_SIZE  = kbot.VIDEO_SIZE
 TOUCH_SIZE  = kbot.TOUCH_SIZE
 MIN_TOUCH_SIDE = min(*TOUCH_SIZE)

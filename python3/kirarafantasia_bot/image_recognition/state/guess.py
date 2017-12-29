@@ -17,6 +17,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='state label util')
     parser.add_argument('timestamp', nargs='?', help='timestamp')
     parser.add_argument('--unknown_only', action='store_true', help="unknown_only")
+    parser.add_argument('--imperfect_only', action='store_true', help="imperfect_only")
     parser.add_argument('--disagree', action='store_true', help="disagree")
     args = parser.parse_args()
     
@@ -48,8 +49,10 @@ if __name__ == '__main__':
             continue
         _, img_fn_t = os.path.split(img_fn)
         img = classifier.load_img(img_fn)
-        label, _ = clr.get_state(img)
+        label, perfect = clr.get_state(img)
         if (args.disagree) and (label==known_dict[img_fn]):
+            continue
+        if (args.imperfect_only) and perfect:
             continue
         out_fn_dir = os.path.join('output',label)
         out_fn = os.path.join(out_fn_dir,img_fn_t)

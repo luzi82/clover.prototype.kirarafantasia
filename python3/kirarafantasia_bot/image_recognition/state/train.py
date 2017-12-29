@@ -80,6 +80,7 @@ if __name__ == '__main__':
         'sample_list':          sample_list,
         'test_sample_count':    test_sample_count,
         'epochs':               args.epochs,
+        'mirror_count':         args.mirror_count,
         'mirror_data_list':     [],
     }
 
@@ -139,18 +140,15 @@ if __name__ == '__main__':
             exit(ret_code)
         time.sleep(1)
         
-    exit(0)
-        
-    from . import model as model_setting
-    model = model_setting.create_model(label_count)
-    model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
-
-    for mirror_idx in range(args.mirror_count):
-        hdf5_fn = os.path.join('image_recognition','model','state','weight.{}.hdf5'.format(mirror_idx))
-
-        model.load_weights(hdf5_fn)
-    
-        test_img_list,  test_label_onehot_list  = sample_list_to_data_set(test_sample_list ,label_count)
-        test_predictions = [np.argmax(model.predict(np.expand_dims(img_list, axis=0))) for img_list in test_img_list]
-        test_accuracy = np.sum(np.array(test_predictions)==np.argmax(test_label_onehot_list, axis=1))/len(test_predictions)
-        print('Mirror {0}/{1} test accuracy: {2:.4f}'.format(mirror_idx,args.mirror_count,test_accuracy))
+    proc = subprocess.Popen([
+            sys.executable,
+            '-m','kirarafantasia_bot.image_recognition.state._train_test',
+            train_unit_path,
+        ],
+        stderr=None,
+        stdout=None
+    )
+    ret_code = proc.wait()
+    if ret_code != 0:
+        print('_train_test quit with err code: {}'.format(ret_code))
+        exit(ret_code)

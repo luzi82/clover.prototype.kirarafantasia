@@ -99,7 +99,7 @@ class BotLogic:
         
         img = img.astype('float32')*2/255-1
         
-        best_state, state_perfect = self.state_clr.get_state(img)
+        best_state, _, state_perfect = self.state_clr.get(img)
         state = best_state if state_perfect else None
 
         ret = {

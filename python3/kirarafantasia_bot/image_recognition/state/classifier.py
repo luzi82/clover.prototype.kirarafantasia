@@ -41,7 +41,7 @@ class StateClassifier:
             model.load_weights(weight_path)
             self.model_list.append(model)
 
-    def get_state(self, img):
+    def get(self, img):
         assert(np.amax(img)<=1)
         assert(np.amin(img)>=-1)
     
@@ -49,16 +49,33 @@ class StateClassifier:
             return '_IGNORE', True
         
         img = preprocess_img(img)
-        score_list = [0] * self.label_name_count
+        score_list_list = np.zeros((self.mirror_count,1,self.label_name_count))
         for mirror_idx in range(self.mirror_count):
             p_list_list = self.model_list[mirror_idx].predict(np.expand_dims(img, axis=0))
-            label_idx = np.argmax(p_list_list,axis=1)[0]
-            score_list[label_idx] += 1
-        label_idx = np.argmax(score_list)
+            assert(p_list_list.shape==(1,self.label_name_count))
+            score_list_list[mirror_idx] = p_list_list
 
-        label_name = self.data['label_name_list'][label_idx]
-        perfect = (score_list[label_idx]==self.mirror_count)
-        return label_name, perfect
+        # cal disagree
+        label_idx_list_list = np.argmax(score_list_list_list, axis=2)
+        assert(label_idx_list_list.shape==(self.mirror_count,1))
+        label_idx_ptp_list = np.ptp(label_idx_list_list,axis=0)
+        assert(label_idx_ptp_list.shape==(1,))
+        label_idx_ptp_max  = np.amax(label_idx_ptp_list)
+        perfect = label_idx_ptp_max<=0
+        
+        # cal label
+        score_list_list = np.average(score_list_list_list, axis=0)
+        assert(score_list_list.shape==(1,self.label_name_count))
+        label_idx_list  = np.argmax(score_list_list, axis=1)
+        assert(label_idx_list.shape==(1,))
+        label_list = [self.data['label_name_list'][i] for i in label_idx_list]
+        label = label_list[0]
+        
+        # cal score
+        score_list = np.max(score_list_list, axis=1)
+        score = score_list[0]
+        
+        return label, score, perfect
 
 if __name__ == '__main__':
     import argparse
@@ -71,5 +88,5 @@ if __name__ == '__main__':
 
     sc = StateClassifier(MODEL_PATH)
 
-    label, perfect = sc.get_state(img)
-    print('label={}, perfect={}'.format(label, perfect))
+    label, score, perfect = sc.get(img)
+    print('label={}, score={}, perfect={}'.format(label, score, perfect))

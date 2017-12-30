@@ -46,14 +46,14 @@ class StateClassifier:
         assert(np.amin(img)>=-1)
     
         if should_ignore(img):
-            return '_IGNORE', True
+            return '_IGNORE', 1, True
         
         img = preprocess_img(img)
-        score_list_list = np.zeros((self.mirror_count,1,self.label_name_count))
+        score_list_list_list = np.zeros((self.mirror_count,1,self.label_name_count))
         for mirror_idx in range(self.mirror_count):
             p_list_list = self.model_list[mirror_idx].predict(np.expand_dims(img, axis=0))
             assert(p_list_list.shape==(1,self.label_name_count))
-            score_list_list[mirror_idx] = p_list_list
+            score_list_list_list[mirror_idx] = p_list_list
 
         # cal disagree
         label_idx_list_list = np.argmax(score_list_list_list, axis=2)

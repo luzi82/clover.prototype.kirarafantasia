@@ -70,6 +70,7 @@ if __name__ == '__main__':
     
     train_turn_count = math.floor(len(train_sample_list)**(1/3))
     batch_size = math.ceil(len(train_sample_list)/train_turn_count)
+    batch_size = 100
     
     epochs = train_unit_data['epochs']
     model.fit(train_img_list, train_label_onehot_list,

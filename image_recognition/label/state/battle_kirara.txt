@@ -1,2 +1,3 @@
 image_recognition/screen_sample/1514027279423/15140276/1514027629302.png
 image_recognition/screen_sample/1514027279423/15140276/1514027629431.png
+image_recognition/screen_sample/1514030645162/15140321/1514032107838.png

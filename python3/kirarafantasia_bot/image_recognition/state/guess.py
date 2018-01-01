@@ -27,11 +27,6 @@ if __name__ == '__main__':
     
     clr = classifier.StateClassifier(MODEL_PATH)
 
-    fn_list = glob.glob(os.path.join('image_recognition','screen_sample','*','*','*.png'))
-
-    if args.timestamp:
-        fn_list = list(filter(lambda v:args.timestamp in v,fn_list))
-
     img_fn_filter_set = set()
     known_dict = {}
     if args.unknown_only or args.disagree:
@@ -42,11 +37,22 @@ if __name__ == '__main__':
             for img_fn in img_fn_list:
                 known_dict[img_fn] = label_state
 
+    if args.disagree:
+        fn_list = list(img_fn_filter_set)
+    elif args.unknown_only:
+        fn_list = glob.glob(os.path.join('image_recognition','screen_sample','*','*','*.png'))
+        fn_list = list(filter(lambda img_fn: not(img_fn in img_fn_filter_set),fn_list))
+    else:
+        fn_list = glob.glob(os.path.join('image_recognition','screen_sample','*','*','*.png'))
+
+    if args.timestamp:
+        fn_list = list(filter(lambda v:args.timestamp in v,fn_list))
+
     for img_fn in fn_list:
-        if (args.unknown_only) and (img_fn in img_fn_filter_set):
-            continue
-        if (args.disagree) and (not(img_fn in img_fn_filter_set)):
-            continue
+        #if (args.unknown_only) and (img_fn in img_fn_filter_set):
+        #    continue
+        #if (args.disagree) and (not(img_fn in img_fn_filter_set)):
+        #    continue
         _, img_fn_t = os.path.split(img_fn)
         img = classifier.load_img(img_fn)
         label, _, perfect = clr.get(img)

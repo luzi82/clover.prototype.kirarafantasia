@@ -54,7 +54,7 @@ class _UArmTouchCalibrationUtil:
         self.video_capture.wait_data_ready()
     
     def get_touchtracedata(self):
-        img = self.video_capture.get_frame()
+        _,_,img = self.video_capture.get_frame()
         data = touch_trace.img_to_touchtracedata(img)
         self.video_capture.release_frame()
         return data

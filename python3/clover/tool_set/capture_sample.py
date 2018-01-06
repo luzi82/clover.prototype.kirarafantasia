@@ -32,7 +32,7 @@ if __name__ == '__main__':
     while True:
         t = int(time.time()*1000)
         t0 = int(t/100000)
-        ndata = vc.get_frame()
+        _,_,ndata = vc.get_frame()
         write_ok = True
         if write_ok:
             fn_dir = os.path.join(output_folder,str(t0))

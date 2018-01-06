@@ -72,7 +72,7 @@ class Bot:
             screen.fill(WHITE)
     
             with self.lock:
-                tmp_img = self.vc.get_frame()
+                _,_,tmp_img = self.vc.get_frame()
                 np.copyto(img, tmp_img)
                 self.vc.release_frame()
             tmp_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -108,7 +108,7 @@ class Bot:
             img = np.zeros((VIDEO_SIZE[1],VIDEO_SIZE[0],3),dtype=np.uint8)
             while self.run:
                 with self.lock:
-                    tmp_img = self.vc.get_frame()
+                    _,_,tmp_img = self.vc.get_frame()
                     np.copyto(img, tmp_img)
                     self.vc.release_frame()
                 arm_data = self.get_arm_data()

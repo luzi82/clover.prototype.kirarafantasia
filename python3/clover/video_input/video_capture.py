@@ -142,7 +142,7 @@ if __name__ == '__main__':
     print('data_ready')
     for i in range(10):
         #print('get_frame')
-        ndata = vc.get_frame()
+        _,_,ndata = vc.get_frame()
         fn = 'x{}.png'.format(i)
         print(fn,file=sys.stderr)
         cv2.imwrite(fn,ndata)

@@ -33,7 +33,7 @@ if __name__ == '__main__':
 
         if not run: break
 
-        img = vc.get_frame()
+        _,_,img = vc.get_frame()
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         vc.release_frame()
         img = numpy.swapaxes(img,0,1)

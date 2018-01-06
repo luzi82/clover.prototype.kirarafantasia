@@ -166,7 +166,7 @@ class BotLogic:
     def draw(self, screen, img_surf, tick_result):
         if self.init_done:
 
-            if tick_result != None:
+            if tick_result is not None:
                 state = tick_result['state']
                 if state is not None:
                     screen.blit(draw_util.text(state,(0,0,0)), (VIDEO_SIZE[0],0))
@@ -176,7 +176,7 @@ class BotLogic:
                     if state in self.state_op_dict:
                         self.state_op_dict[state].draw(screen, tick_result)
 
-            if not tick_result['play']:
+            if (tick_result is not None) and (not tick_result['play']):
                 z_pause.draw(screen, tick_result)
     
             if (tick_result is not None) and ('draw_screen' in tick_result) and (tick_result['draw_screen']):

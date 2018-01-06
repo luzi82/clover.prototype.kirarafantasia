@@ -13,25 +13,14 @@ import clover.common
 import math
 import time
 import subprocess
+from . import _train_unit as tu
 
 WIDTH  = model_setting.WIDTH
 HEIGHT = model_setting.HEIGHT
 
-def sample_list_to_data_set(sample_list, label_count):
-    fn_list = [ sample['fn'] for sample in sample_list ]
-    img_list = load_img_list(fn_list)
-    label_idx_list = np.array([ sample['label_idx'] for sample in sample_list ])
-    label_onehot_list = np_utils.to_categorical(label_idx_list, label_count)
-    return img_list, label_onehot_list
-
-def load_img_list(fn_list):
-    img_list = [ load_img(fn) for fn in fn_list ]
-    return np.array(img_list)
-
-def load_img(fn):
-    img = classifier.load_img(fn)
-    img = classifier.preprocess_img(img)
-    return img
+sample_list_to_data_set = tu.sample_list_to_data_set
+load_img_list = tu.load_img_list
+load_img = tu.load_img
 
 if __name__ == '__main__':
     import argparse

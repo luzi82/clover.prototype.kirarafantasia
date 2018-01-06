@@ -27,8 +27,14 @@ def load_img_list(fn_list):
     return np.array(img_list)
 
 def load_img(fn):
+    cache_fn = os.path.join('cache','state',fn)
+    cache_fn = cache_fn + '.npy'
+    if os.path.exists(cache_fn):
+        return np.load(cache_fn)
     img = classifier.load_img(fn)
     img = classifier.preprocess_img(img)
+    clover.common.makedirs(os.path.dirname(cache_fn))
+    np.save(cache_fn,img)
     return img
 
 if __name__ == '__main__':

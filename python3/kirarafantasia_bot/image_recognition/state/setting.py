@@ -1,6 +1,7 @@
 # avoid tensorflow dependency
 import numpy as np
 import cv2
+import clover.image_recognition
 
 NAME = 'state'
 HEIGHT = 40

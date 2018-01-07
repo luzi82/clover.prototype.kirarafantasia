@@ -4,18 +4,60 @@ import sys
 import random
 import cv2
 import numpy as np
-#from keras.utils import np_utils
+from keras.utils import np_utils
 #from keras.callbacks import ModelCheckpoint
 import json
 #from . import model as model_setting
-#from . import classifier
+from . import classifier
 import clover.common
 import math
 import time
 import subprocess
+import gc
 
 #WIDTH  = model_setting.WIDTH
 #HEIGHT = model_setting.HEIGHT
+
+def save_data_set(dir_path, img_list, label_onehot_list):
+    clover.common.reset_dir(dir_path)
+    #img_list, label_onehot_list = sample_list_to_data_set(sample_list,label_count)
+    img_list_fn          = os.path.join(dir_path,'img_list.npy')
+    label_onehot_list_fn = os.path.join(dir_path,'label_onehot_list.npy')
+    np.save(img_list_fn,img_list)
+    np.save(label_onehot_list_fn,label_onehot_list)
+
+def load_data_set(dir_path):
+    img_list_fn          = os.path.join(dir_path,'img_list.npy')
+    label_onehot_list_fn = os.path.join(dir_path,'label_onehot_list.npy')
+    img_list = np.load(img_list_fn)
+    label_onehot_list = np.load(label_onehot_list_fn)
+    return img_list, label_onehot_list
+
+def sample_list_to_data_set(sample_list, label_count):
+    fn_list = [ sample['fn'] for sample in sample_list ]
+    img_list = load_img_list(fn_list)
+    label_idx_list = np.array([ sample['label_idx'] for sample in sample_list ])
+    label_onehot_list = np_utils.to_categorical(label_idx_list, label_count)
+    return img_list, label_onehot_list
+
+def load_img_list(fn_list):
+    start_time = time.time()
+    img_list = [ load_img(fn) for fn in fn_list ]
+    end_time = time.time()
+    diff_time = end_time-start_time
+    print('load_img_list: start_time={}, end_time={}, diff_time={}'.format(start_time,end_time,diff_time));
+    return np.array(img_list)
+
+def load_img(fn):
+    cache_fn = os.path.join('cache','state',fn)
+    cache_fn = cache_fn + '.npy'
+    if os.path.exists(cache_fn):
+        return np.load(cache_fn)
+    img = classifier.load_img(fn)
+    img = classifier.preprocess_img(img)
+    clover.common.makedirs(os.path.dirname(cache_fn))
+    np.save(cache_fn,img)
+    return img
 
 if __name__ == '__main__':
     import argparse
@@ -46,7 +88,11 @@ if __name__ == '__main__':
         model.summary()
         quit()
 
-    # load sample
+    # clear session
+    SESSION_CACHE_DIR_PATH = os.path.join('cache','session','state.train')
+    clover.common.reset_dir(SESSION_CACHE_DIR_PATH)
+
+    # load sample list
     sample_list = []
     for label_idx in range(label_count):
         label_name = label_name_list[label_idx]
@@ -71,25 +117,33 @@ if __name__ == '__main__':
         json.dump(j, fp=fout, indent=2, sort_keys=True)
         fout.write('\n')
 
-    test_sample_count       = int(len(sample_list)/10)
-    test_sample_list        = sample_list[:test_sample_count]
-    train_valid_sample_list = sample_list[test_sample_count:]
+    test_sample_count        = int(len(sample_list)/10)
+    test_sample_list         = sample_list[:test_sample_count]
+    train_valid_sample_list  = sample_list[test_sample_count:]
+    train_valid_sample_count = len(train_valid_sample_list)
+
+    # load data set, save to cache
+    img_list, label_onehot_list = sample_list_to_data_set(train_valid_sample_list,label_count)
+    train_valid_sample_data_dir_path = os.path.join(SESSION_CACHE_DIR_PATH,'train_valid_sample_data')
+    save_data_set(train_valid_sample_data_dir_path, img_list, label_onehot_list)
+    del img_list, label_onehot_list
 
     train_unit_data = {
-        'label_count':          label_count,
-        'sample_list':          sample_list,
-        'test_sample_count':    test_sample_count,
-        'epochs':               args.epochs,
-        'mirror_count':         args.mirror_count,
-        'mirror_data_list':     [],
+        'label_count':                      label_count,
+        'sample_list':                      sample_list,
+        'train_valid_sample_data_dir_path': train_valid_sample_data_dir_path,
+        'test_sample_count':                test_sample_count,
+        'epochs':                           args.epochs,
+        'mirror_count':                     args.mirror_count,
+        'mirror_data_list':                 [],
     }
 
     for mirror_idx in range(args.mirror_count):
 
         hdf5_fn = os.path.join('image_recognition','model','state','weight.{}.hdf5'.format(mirror_idx))
 
-        valid_start = int(len(train_valid_sample_list)*(mirror_idx+0)/float(args.mirror_count))
-        valid_end   = int(len(train_valid_sample_list)*(mirror_idx+1)/float(args.mirror_count))
+        valid_start = int(train_valid_sample_count*(mirror_idx+0)/float(args.mirror_count))
+        valid_end   = int(train_valid_sample_count*(mirror_idx+1)/float(args.mirror_count))
         
         mirror_data = {
             'hdf5_fn': hdf5_fn,
@@ -98,31 +152,11 @@ if __name__ == '__main__':
         }
         train_unit_data['mirror_data_list'].append(mirror_data)
         
-#        train_sample_list = train_valid_sample_list[:valid_start]+train_valid_sample_list[valid_end:]
-#        valid_sample_list = train_valid_sample_list[valid_start:valid_end]
-#        
-#        random.shuffle(train_sample_list)
-#
-#        # create model
-#        model = model_setting.create_model(label_count)
-#        model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
-#            
-#        train_img_list, train_label_onehot_list = sample_list_to_data_set(train_sample_list,label_count)
-#        valid_img_list, valid_label_onehot_list = sample_list_to_data_set(valid_sample_list,label_count)
-#    
-#        checkpointer = ModelCheckpoint(filepath=hdf5_fn, verbose=1, save_best_only=True)
-#        
-#        train_turn_count = math.floor(len(train_sample_list)**(1/3))
-#        batch_size = math.ceil(len(train_sample_list)/train_turn_count)
-#        
-#        epochs = args.epochs
-#        model.fit(train_img_list, train_label_onehot_list,
-#            validation_data=(valid_img_list, valid_label_onehot_list),
-#            epochs=epochs, batch_size=batch_size, callbacks=[checkpointer], verbose=1)
-
     TRAIN_UNIT_PATH_FORMAT = '/tmp/IWNFWFKRMF-{}.json'
     train_unit_path = TRAIN_UNIT_PATH_FORMAT.format(int(time.time()))
     clover.common.write_json(train_unit_path,train_unit_data)
+    
+    gc.collect()
     
     for mirror_idx in range(args.mirror_count):
         proc = subprocess.Popen([

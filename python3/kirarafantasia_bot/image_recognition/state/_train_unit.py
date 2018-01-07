@@ -4,38 +4,22 @@ import sys
 import random
 import cv2
 import numpy as np
-from keras.utils import np_utils
+#from keras.utils import np_utils
 from keras.callbacks import ModelCheckpoint
 import json
 from . import model as model_setting
-from . import classifier
+#from . import classifier
 import clover.common
 import math
+import time
+from . import train
 
 WIDTH  = model_setting.WIDTH
 HEIGHT = model_setting.HEIGHT
 
-def sample_list_to_data_set(sample_list, label_count):
-    fn_list = [ sample['fn'] for sample in sample_list ]
-    img_list = load_img_list(fn_list)
-    label_idx_list = np.array([ sample['label_idx'] for sample in sample_list ])
-    label_onehot_list = np_utils.to_categorical(label_idx_list, label_count)
-    return img_list, label_onehot_list
-
-def load_img_list(fn_list):
-    img_list = [ load_img(fn) for fn in fn_list ]
-    return np.array(img_list)
-
-def load_img(fn):
-    cache_fn = os.path.join('cache','state',fn)
-    cache_fn = cache_fn + '.npy'
-    if os.path.exists(cache_fn):
-        return np.load(cache_fn)
-    img = classifier.load_img(fn)
-    img = classifier.preprocess_img(img)
-    clover.common.makedirs(os.path.dirname(cache_fn))
-    np.save(cache_fn,img)
-    return img
+#sample_list_to_data_set = train.sample_list_to_data_set
+#load_img_list = train.load_img_list
+#load_img = train.load_img
 
 if __name__ == '__main__':
     import argparse
@@ -54,28 +38,50 @@ if __name__ == '__main__':
     label_count = train_unit_data['label_count']
     test_sample_count = train_unit_data['test_sample_count']
     sample_list = train_unit_data['sample_list']
+    train_valid_sample_data_dir_path = train_unit_data['train_valid_sample_data_dir_path']
     hdf5_fn = mirror_data['hdf5_fn']
-    
-    train_valid_sample_list = sample_list[test_sample_count:]
 
     valid_start = mirror_data['valid_start']
     valid_end   = mirror_data['valid_end']
-    train_sample_list = train_valid_sample_list[:valid_start]+train_valid_sample_list[valid_end:]
-    valid_sample_list = train_valid_sample_list[valid_start:valid_end]
-        
-    random.shuffle(train_sample_list)
+
+    train_sample_count = len(sample_list) - test_sample_count - valid_end + valid_start
+    valid_sample_count = valid_end - valid_start
+    
+#    train_valid_sample_list = sample_list[test_sample_count:]
+#
+#    valid_start = mirror_data['valid_start']
+#    valid_end   = mirror_data['valid_end']
+#    train_sample_list = train_valid_sample_list[:valid_start]+train_valid_sample_list[valid_end:]
+#    valid_sample_list = train_valid_sample_list[valid_start:valid_end]
+#
+#    random.shuffle(train_sample_list)
+#        
+#    train_img_list, train_label_onehot_list = sample_list_to_data_set(train_sample_list,label_count)
+#    valid_img_list, valid_label_onehot_list = sample_list_to_data_set(valid_sample_list,label_count)
+
+    train_valid_img_list, train_valid_label_onehot_list = train.load_data_set(train_valid_sample_data_dir_path)
+    train_img_list = np.concatenate((train_valid_img_list[:valid_start],train_valid_img_list[valid_end:]))
+    assert(train_img_list.shape==(train_sample_count,HEIGHT,WIDTH,5))
+    train_label_onehot_list = np.concatenate((train_valid_label_onehot_list[:valid_start],train_valid_label_onehot_list[valid_end:]))
+    assert(train_label_onehot_list.shape==(train_sample_count,label_count))
+    valid_img_list = train_valid_img_list[valid_start:valid_end]
+    assert(valid_img_list.shape==(valid_sample_count,HEIGHT,WIDTH,5))
+    valid_label_onehot_list = train_valid_label_onehot_list[valid_start:valid_end]
+    assert(valid_label_onehot_list.shape==(valid_sample_count,label_count))
+    
+    # shuffle train
+    p = np.random.permutation(train_sample_count)
+    train_img_list = train_img_list[p]
+    train_label_onehot_list = train_label_onehot_list[p]
 
     # create model
     model = model_setting.create_model(label_count)
     model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
         
-    train_img_list, train_label_onehot_list = sample_list_to_data_set(train_sample_list,label_count)
-    valid_img_list, valid_label_onehot_list = sample_list_to_data_set(valid_sample_list,label_count)
-
     checkpointer = ModelCheckpoint(filepath=hdf5_fn, verbose=1, save_best_only=True)
     
-    train_turn_count = math.floor(len(train_sample_list)**(1/3))
-    batch_size = math.ceil(len(train_sample_list)/train_turn_count)
+    #train_turn_count = math.floor(len(train_sample_list)**(1/3))
+    #batch_size = math.ceil(len(train_sample_list)/train_turn_count)
     batch_size = 100
     
     epochs = train_unit_data['epochs']

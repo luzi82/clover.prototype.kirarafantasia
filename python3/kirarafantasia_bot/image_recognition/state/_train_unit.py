@@ -13,6 +13,7 @@ import clover.common
 import math
 import time
 from . import train
+import gc
 
 WIDTH  = model_setting.WIDTH
 HEIGHT = model_setting.HEIGHT
@@ -60,6 +61,7 @@ if __name__ == '__main__':
 #    valid_img_list, valid_label_onehot_list = sample_list_to_data_set(valid_sample_list,label_count)
 
     train_valid_img_list, train_valid_label_onehot_list = train.load_data_set(train_valid_sample_data_dir_path)
+
     train_img_list = np.concatenate((train_valid_img_list[:valid_start],train_valid_img_list[valid_end:]))
     assert(train_img_list.shape==(train_sample_count,HEIGHT,WIDTH,5))
     train_label_onehot_list = np.concatenate((train_valid_label_onehot_list[:valid_start],train_valid_label_onehot_list[valid_end:]))
@@ -68,11 +70,25 @@ if __name__ == '__main__':
     assert(valid_img_list.shape==(valid_sample_count,HEIGHT,WIDTH,5))
     valid_label_onehot_list = train_valid_label_onehot_list[valid_start:valid_end]
     assert(valid_label_onehot_list.shape==(valid_sample_count,label_count))
+
+    del train_valid_img_list, train_valid_label_onehot_list
+    gc.collect()
     
     # shuffle train
     p = np.random.permutation(train_sample_count)
     train_img_list = train_img_list[p]
     train_label_onehot_list = train_label_onehot_list[p]
+    
+    # destory np link, free mem
+    gc.collect()
+    train_img_list = np.copy(train_img_list)
+    gc.collect()
+    train_label_onehot_list = np.copy(train_label_onehot_list)
+    gc.collect()
+    valid_img_list = np.copy(valid_img_list)
+    gc.collect()
+    valid_label_onehot_list = np.copy(valid_label_onehot_list)
+    gc.collect()
 
     # create model
     model = model_setting.create_model(label_count)

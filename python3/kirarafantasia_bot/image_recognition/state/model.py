@@ -4,9 +4,10 @@ from keras.layers import GaussianNoise
 from keras.models import Sequential
 from keras import regularizers
 from clover.common import PHI
+from . import setting
 
-HEIGHT = 40
-WIDTH  = 71
+HEIGHT = setting.HEIGHT
+WIDTH  = setting.WIDTH
 
 def create_model(label_count):
     model = Sequential()

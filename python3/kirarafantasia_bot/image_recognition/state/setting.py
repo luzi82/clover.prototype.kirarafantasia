@@ -3,6 +3,8 @@ import numpy as np
 import cv2
 
 NAME = 'state'
+HEIGHT = 40
+WIDTH  = 71
 
 def should_ignore(img):
     IGNORE_STDDEV_MAX = 0.2

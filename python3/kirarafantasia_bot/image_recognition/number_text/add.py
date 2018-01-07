@@ -33,6 +33,7 @@ if __name__ == '__main__':
         mm = fn_prog.match(fn)
         if mm is None:
             print('pattern not match: {}'.format(fn))
+            continue
         fidx = int(mm.group(1))
         x = int(mm.group(2))
         y = int(mm.group(3))
@@ -40,6 +41,7 @@ if __name__ == '__main__':
         yh = int(mm.group(5))
         label = mm.group(6)
         label = str.replace(label,'_','/')
+        label = str.replace(label,';',':')
         image_timestamp=clover.image_recognition.get_timestamp(fidx)
         image_ori_path = os.path.join('image_recognition','screen_sample',str(image_timestamp),str(int(fidx/100000)),'{}.png'.format(fidx))
         if not os.path.isfile(image_ori_path):

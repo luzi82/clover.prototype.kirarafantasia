@@ -40,7 +40,7 @@ def sample_list_to_data_set(sample_list, label_count):
     img_list = load_img_list(fn_list)
     label_idx_list = np.array([ sample['label_idx'] for sample in sample_list ])
     #label_onehot_list = np_utils.to_categorical(label_idx_list, label_count)
-    label_onehot_list = np.zeros((len(label_idx_list),label_count))
+    label_onehot_list = np.zeros((len(label_idx_list),label_count),dtype=np.float32)
     label_onehot_list[np.arange(len(label_idx_list)), label_idx_list] = 1
     return img_list, label_onehot_list
 
@@ -108,7 +108,7 @@ if __name__ == '__main__':
 
     # randomize sample order
     random.shuffle(sample_list)
-    sample_list = sample_list[:100]
+    #sample_list = sample_list[:100]
 
     # clean dir
     clover.common.reset_dir(os.path.join('image_recognition','model','state'))

@@ -16,12 +16,7 @@ WIDTH  = model_setting.WIDTH
 HEIGHT = model_setting.HEIGHT
 
 load_img = clover.image_recognition.load_img
-
-def preprocess_img(img):
-    img = cv2.resize(img,dsize=(WIDTH,HEIGHT),interpolation=cv2.INTER_AREA)
-    img = np.append(img,clover.image_recognition.xy_layer(WIDTH,HEIGHT),axis=2)
-    return img
-
+preprocess_img = setting.preprocess_img
 should_ignore = setting.should_ignore
 
 class StateClassifier:

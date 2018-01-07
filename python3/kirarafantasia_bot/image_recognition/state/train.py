@@ -4,16 +4,18 @@ import sys
 import random
 import cv2
 import numpy as np
-from keras.utils import np_utils
+#from keras.utils import np_utils
 #from keras.callbacks import ModelCheckpoint
 import json
 #from . import model as model_setting
-from . import classifier
+#from . import classifier
 import clover.common
+import clover.image_recognition
 import math
 import time
 import subprocess
 import gc
+from . import setting
 
 #WIDTH  = model_setting.WIDTH
 #HEIGHT = model_setting.HEIGHT
@@ -37,7 +39,9 @@ def sample_list_to_data_set(sample_list, label_count):
     fn_list = [ sample['fn'] for sample in sample_list ]
     img_list = load_img_list(fn_list)
     label_idx_list = np.array([ sample['label_idx'] for sample in sample_list ])
-    label_onehot_list = np_utils.to_categorical(label_idx_list, label_count)
+    #label_onehot_list = np_utils.to_categorical(label_idx_list, label_count)
+    label_onehot_list = np.zeros((len(label_idx_list),label_count))
+    label_onehot_list[np.arange(len(label_idx_list)), label_idx_list] = 1
     return img_list, label_onehot_list
 
 def load_img_list(fn_list):
@@ -53,8 +57,8 @@ def load_img(fn):
     cache_fn = cache_fn + '.npy'
     if os.path.exists(cache_fn):
         return np.load(cache_fn)
-    img = classifier.load_img(fn)
-    img = classifier.preprocess_img(img)
+    img = clover.image_recognition.load_img(fn)
+    img = setting.preprocess_img(img)
     clover.common.makedirs(os.path.dirname(cache_fn))
     np.save(cache_fn,img)
     return img
@@ -104,6 +108,7 @@ if __name__ == '__main__':
 
     # randomize sample order
     random.shuffle(sample_list)
+    sample_list = sample_list[:100]
 
     # clean dir
     clover.common.reset_dir(os.path.join('image_recognition','model','state'))

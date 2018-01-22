@@ -10,7 +10,7 @@ WIDTH  = 71
 
 def create_model(label_count):
     model = Sequential()
-    model.add(GaussianNoise(stddev=0.01, input_shape=(HEIGHT,WIDTH,5)))
+    model.add(GaussianNoise(stddev=0.10, input_shape=(HEIGHT,WIDTH,5)))
     model.add(Conv2D(filters=32, kernel_size=1, padding='valid', activation='elu'))
     model.add(Conv2D(filters=32, kernel_size=(3,2), padding='valid', activation='elu'))
     model.add(Conv2D(filters=32, kernel_size=1, padding='valid', activation='elu'))

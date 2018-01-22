@@ -17,6 +17,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='state label util')
     parser.add_argument('timestamp', nargs='?', help='timestamp')
     parser.add_argument('--unknown_only', action='store_true', help="unknown_only")
+    parser.add_argument('--imperfect_only', action='store_true', help="imperfect_only")
     parser.add_argument('--disagree', action='store_true', help="disagree")
     args = parser.parse_args()
     
@@ -25,11 +26,6 @@ if __name__ == '__main__':
     clover.common.reset_dir('output')
     
     clr = classifier.StateClassifier(MODEL_PATH)
-
-    fn_list = glob.glob(os.path.join('image_recognition','screen_sample','*','*','*.png'))
-
-    if args.timestamp:
-        fn_list = list(filter(lambda v:args.timestamp in v,fn_list))
 
     img_fn_filter_set = set()
     known_dict = {}
@@ -41,15 +37,28 @@ if __name__ == '__main__':
             for img_fn in img_fn_list:
                 known_dict[img_fn] = label_state
 
+    if args.disagree:
+        fn_list = list(img_fn_filter_set)
+    elif args.unknown_only:
+        fn_list = glob.glob(os.path.join('image_recognition','screen_sample','*','*','*.png'))
+        fn_list = list(filter(lambda img_fn: not(img_fn in img_fn_filter_set),fn_list))
+    else:
+        fn_list = glob.glob(os.path.join('image_recognition','screen_sample','*','*','*.png'))
+
+    if args.timestamp:
+        fn_list = list(filter(lambda v:args.timestamp in v,fn_list))
+
     for img_fn in fn_list:
-        if (args.unknown_only) and (img_fn in img_fn_filter_set):
-            continue
-        if (args.disagree) and (not(img_fn in img_fn_filter_set)):
-            continue
+        #if (args.unknown_only) and (img_fn in img_fn_filter_set):
+        #    continue
+        #if (args.disagree) and (not(img_fn in img_fn_filter_set)):
+        #    continue
         _, img_fn_t = os.path.split(img_fn)
         img = classifier.load_img(img_fn)
-        label, _ = clr.get_state(img)
+        label, _, perfect = clr.get(img)
         if (args.disagree) and (label==known_dict[img_fn]):
+            continue
+        if (args.imperfect_only) and perfect:
             continue
         out_fn_dir = os.path.join('output',label)
         out_fn = os.path.join(out_fn_dir,img_fn_t)

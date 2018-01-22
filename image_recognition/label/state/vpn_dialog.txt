@@ -1,3 +1,5 @@
 image_recognition/screen_sample/1514036086592/15140408/1514040860326.png
 image_recognition/screen_sample/1514047731304/15140958/1514095811327.png
 image_recognition/screen_sample/1514108057110/15142046/1514204698673.png
+image_recognition/screen_sample/1515855292607/15161640/1516164060646.png
+image_recognition/screen_sample/1515855292607/15166133/1516613365234.png

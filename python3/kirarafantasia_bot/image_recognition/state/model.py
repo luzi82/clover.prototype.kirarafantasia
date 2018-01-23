@@ -1,6 +1,6 @@
 from keras.layers import Conv2D, MaxPooling2D, GlobalAveragePooling2D, GlobalMaxPooling2D
 from keras.layers import Dropout, Flatten, Dense, BatchNormalization, Activation
-from keras.layers import GaussianNoise
+from keras.layers import GaussianNoise, Concatenate, Lambda
 from keras.layers import Input
 from keras.models import Model
 from keras import regularizers
@@ -8,15 +8,24 @@ from clover.common import PHI
 from . import setting
 import os
 import kirarafantasia_bot.image_recognition.state as ir_state
+import clover.image_recognition
+from keras import backend as K
+import numpy as np
 
 HEIGHT = setting.HEIGHT
 WIDTH  = setting.WIDTH
 
 def create_model(label_count):
-    tensor_in = Input(shape=(HEIGHT,WIDTH,5))
+    tensor_in = Input(shape=(HEIGHT,WIDTH,3))
     
+    #xy_tensor = clover.image_recognition.xy_layer(WIDTH,HEIGHT)
+    #xy_tensor = np.reshape(xy_tensor,(HEIGHT,WIDTH,2))
+    #xy_tensor = K.constant(xy_tensor)
+    xy_tensor = Lambda(xy_layer_func,output_shape=(HEIGHT,WIDTH,2))(tensor_in)
+
     tensor = tensor_in
     tensor = GaussianNoise(stddev=0.03)(tensor)
+    tensor = Concatenate(axis=3)([tensor,xy_tensor])
     tensor = Conv2D(filters=32, kernel_size=1, padding='valid', activation='elu')(tensor)
     tensor = Conv2D(filters=32, kernel_size=(3,2), padding='valid', activation='elu')(tensor)
     tensor = Conv2D(filters=32, kernel_size=1, padding='valid', activation='elu')(tensor)
@@ -59,6 +68,14 @@ def create_model(label_count):
     model = Model(inputs=[tensor_in], outputs=tensor_out)
     
     return model
+
+def xy_layer_func(x, input_shape):
+    xs0 = input_shape[0]
+    xy_tensor = clover.image_recognition.xy_layer(WIDTH,HEIGHT)
+    xy_tensor = K.constant(xy_tensor)
+    return xy_tensor
+#    #return xy_tensor
+#    #return K.concatenate([x,xy_tensor],axis=2)
 
 if __name__ == '__main__':
     label_name_list = ir_state.get_label_list()

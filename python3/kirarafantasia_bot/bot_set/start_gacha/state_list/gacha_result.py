@@ -124,6 +124,7 @@ def tick(bot_logic, img, arm, t, ret):
             bot_logic.gacha_result_cooldown_1 = 0
             bot_logic.gacha_result_cooldown_2 = t+3
         else:
+            bot_logic.gacha_result_cooldown_0 = t+3
             bot_logic.gacha_result_cooldown_1 = t+99
             bot_logic.gacha_result_cooldown_2 = t+999
         

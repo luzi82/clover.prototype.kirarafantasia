@@ -53,7 +53,7 @@ class BotLogic:
         self.state_op_dict['gacha_result'] = gacha_result
         self.state_op_dict['ok_dialog']    = ok_dialog
         #self.state_op_dict['top_right']    = click.Click('top_right',btn_xy(489,9,70,15),1)
-        self.state_op_dict['top_right']    = click.Click('top_right',btn_xy(489,9,70,15),2,0.5)
+        self.state_op_dict['top_right']    = click.Click('top_right',btn_xy(489,9+5,70,15),2,0.5)
         self.state_op_dict['gacha_retry_dialog'] = click.Click('gacha_retry_dialog',btn_xy(181,215,89,23),2)
         self.state_op_dict['ios_menu']    = click.Click('top_right',btn_xy(27,244,60,60),2)
 
@@ -99,7 +99,7 @@ class BotLogic:
         
         img = img.astype('float32')*2/255-1
         
-        best_state, state_perfect = self.state_clr.get_state(img)
+        best_state, _, state_perfect = self.state_clr.get(img)
         state = best_state if state_perfect else None
 
         ret = {
@@ -176,7 +176,7 @@ class BotLogic:
                     if state in self.state_op_dict:
                         self.state_op_dict[state].draw(screen, tick_result)
 
-            if not tick_result['play']:
+            if (tick_result is not None) and (not tick_result['play']):
                 z_pause.draw(screen, tick_result)
     
             if (tick_result is not None) and ('draw_screen' in tick_result) and (tick_result['draw_screen']):

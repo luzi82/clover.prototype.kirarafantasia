@@ -16,7 +16,7 @@ def create_model(label_count):
     tensor_in = Input(shape=(HEIGHT,WIDTH,5))
     
     tensor = tensor_in
-    tensor = GaussianNoise(stddev=0.03)(tensor)
+    tensor = GaussianNoise(stddev=0.10)(tensor)
     tensor = Conv2D(filters=32, kernel_size=1, padding='valid', activation='elu')(tensor)
     tensor = Conv2D(filters=32, kernel_size=(3,2), padding='valid', activation='elu')(tensor)
     tensor = Conv2D(filters=32, kernel_size=1, padding='valid', activation='elu')(tensor)

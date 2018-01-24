@@ -60,7 +60,7 @@ if __name__ == '__main__':
 
     # randomize sample order
     random.shuffle(sample_list)
-    sample_list = sample_list[:10]
+    #sample_list = sample_list[:10]
 
     # clean dir
     clover.common.reset_dir(os.path.join('image_recognition','model','state'))

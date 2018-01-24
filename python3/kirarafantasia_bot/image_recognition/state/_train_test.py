@@ -14,6 +14,7 @@ import math
 import time
 import subprocess
 from . import train as train
+import clover.image_recognition
 
 WIDTH  = model_setting.WIDTH
 HEIGHT = model_setting.HEIGHT
@@ -39,6 +40,10 @@ if __name__ == '__main__':
 
     test_sample_list        = sample_list[:test_sample_count]
     test_img_list,  test_label_onehot_list  = sample_list_to_data_set(test_sample_list ,label_count)
+
+    # xy layer
+    xy_layer = clover.image_recognition.xy_layer(WIDTH,HEIGHT)
+    xy_layerx1 = np.reshape(xy_layer,(1,HEIGHT,WIDTH,2))
         
     model = model_setting.create_model(label_count)
 
@@ -47,6 +52,6 @@ if __name__ == '__main__':
 
         model.load_weights(hdf5_fn)
     
-        test_predictions = [np.argmax(model.predict(np.expand_dims(img_list, axis=0))) for img_list in test_img_list]
+        test_predictions = [np.argmax(model.predict([np.expand_dims(img_list, axis=0),xy_layerx1])) for img_list in test_img_list]
         test_accuracy = np.sum(np.array(test_predictions)==np.argmax(test_label_onehot_list, axis=1))/len(test_predictions)
         print('Mirror {0}/{1} test accuracy: {2:.4f}'.format(mirror_idx,mirror_count,test_accuracy))

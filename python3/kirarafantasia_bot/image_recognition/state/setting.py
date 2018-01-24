@@ -21,5 +21,5 @@ def should_ignore(img):
 
 def preprocess_img(img):
     img = cv2.resize(img,dsize=(WIDTH,HEIGHT),interpolation=cv2.INTER_AREA)
-    img = np.append(img,clover.image_recognition.xy_layer(WIDTH,HEIGHT),axis=2)
+    #img = np.append(img,clover.image_recognition.xy_layer(WIDTH,HEIGHT),axis=2)
     return img

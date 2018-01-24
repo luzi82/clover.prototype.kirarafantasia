@@ -14,6 +14,7 @@ import math
 import time
 from . import train
 import gc
+import clover.image_recognition
 
 WIDTH  = model_setting.WIDTH
 HEIGHT = model_setting.HEIGHT
@@ -63,11 +64,11 @@ if __name__ == '__main__':
     train_valid_img_list, train_valid_label_onehot_list = train.load_data_set(train_valid_sample_data_dir_path)
 
     train_img_list = np.concatenate((train_valid_img_list[:valid_start],train_valid_img_list[valid_end:]))
-    assert(train_img_list.shape==(train_sample_count,HEIGHT,WIDTH,5))
+    assert(train_img_list.shape==(train_sample_count,HEIGHT,WIDTH,3))
     train_label_onehot_list = np.concatenate((train_valid_label_onehot_list[:valid_start],train_valid_label_onehot_list[valid_end:]))
     assert(train_label_onehot_list.shape==(train_sample_count,label_count))
     valid_img_list = train_valid_img_list[valid_start:valid_end]
-    assert(valid_img_list.shape==(valid_sample_count,HEIGHT,WIDTH,5))
+    assert(valid_img_list.shape==(valid_sample_count,HEIGHT,WIDTH,3))
     valid_label_onehot_list = train_valid_label_onehot_list[valid_start:valid_end]
     assert(valid_label_onehot_list.shape==(valid_sample_count,label_count))
 
@@ -90,6 +91,11 @@ if __name__ == '__main__':
     valid_label_onehot_list = np.copy(valid_label_onehot_list)
     gc.collect()
 
+    # xy layer
+    xy_layer = clover.image_recognition.xy_layer(WIDTH,HEIGHT)
+    train_xy_layer = np.broadcast_to(xy_layer,(train_sample_count,HEIGHT,WIDTH,2))
+    valid_xy_layer = np.broadcast_to(xy_layer,(valid_sample_count,HEIGHT,WIDTH,2))
+
     # create model
     model = model_setting.create_model(label_count)
     model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
@@ -101,6 +107,6 @@ if __name__ == '__main__':
     batch_size = 100
     
     epochs = train_unit_data['epochs']
-    model.fit(train_img_list, train_label_onehot_list,
-        validation_data=(valid_img_list, valid_label_onehot_list),
+    model.fit([train_img_list, train_xy_layer], train_label_onehot_list,
+        validation_data=([valid_img_list, valid_xy_layer], valid_label_onehot_list),
         epochs=epochs, batch_size=batch_size, callbacks=[checkpointer], verbose=1)

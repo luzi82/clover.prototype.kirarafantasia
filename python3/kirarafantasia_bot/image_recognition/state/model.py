@@ -18,14 +18,11 @@ WIDTH  = setting.WIDTH
 def create_model(label_count):
     tensor_in = Input(shape=(HEIGHT,WIDTH,3))
     
-    #xy_tensor = clover.image_recognition.xy_layer(WIDTH,HEIGHT)
-    #xy_tensor = np.reshape(xy_tensor,(HEIGHT,WIDTH,2))
-    #xy_tensor = K.constant(xy_tensor)
-    xy_tensor = Lambda(xy_layer_func,output_shape=(HEIGHT,WIDTH,2))(tensor_in)
+    tensor_xy = Input(shape=(HEIGHT,WIDTH,2))
 
     tensor = tensor_in
     tensor = GaussianNoise(stddev=0.03)(tensor)
-    tensor = Concatenate(axis=3)([tensor,xy_tensor])
+    tensor = Concatenate(axis=3)([tensor,tensor_xy])
     tensor = Conv2D(filters=32, kernel_size=1, padding='valid', activation='elu')(tensor)
     tensor = Conv2D(filters=32, kernel_size=(3,2), padding='valid', activation='elu')(tensor)
     tensor = Conv2D(filters=32, kernel_size=1, padding='valid', activation='elu')(tensor)
@@ -65,17 +62,9 @@ def create_model(label_count):
     tensor = Activation('softmax')(tensor)
     tensor_out = tensor
 
-    model = Model(inputs=[tensor_in], outputs=tensor_out)
+    model = Model(inputs=[tensor_in,tensor_xy], outputs=tensor_out)
     
     return model
-
-def xy_layer_func(x, input_shape):
-    xs0 = input_shape[0]
-    xy_tensor = clover.image_recognition.xy_layer(WIDTH,HEIGHT)
-    xy_tensor = K.constant(xy_tensor)
-    return xy_tensor
-#    #return xy_tensor
-#    #return K.concatenate([x,xy_tensor],axis=2)
 
 if __name__ == '__main__':
     label_name_list = ir_state.get_label_list()

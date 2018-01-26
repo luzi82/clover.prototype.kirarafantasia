@@ -18,48 +18,57 @@ WIDTH  = setting.WIDTH
 
 def create_model(label_count):
     tensor_in = Input(shape=(HEIGHT,WIDTH,3))
-    
-    tensor0 = Flatten()(tensor_in)
-    tensor0 = Dense(label_count, activation='elu')(tensor0)
 
     tensor = tensor_in
     tensor = GaussianNoise(stddev=0.10)(tensor)
+
+    tensor0 = Flatten()(tensor)
+    tensor0 = Dense(label_count, activation='elu')(tensor0)
+
     tensor1_shape = K.int_shape(tensor)[1:-1]+(label_count,)
     tensor1 = Dense(product(tensor1_shape), activation='elu')(tensor0)
     tensor1 = Reshape(tensor1_shape)(tensor1)
     tensor = Concatenate(axis=3)([tensor,tensor1])
+
     tensor = Conv2D(filters=32, kernel_size=1, padding='valid', activation='elu')(tensor)
     tensor = Conv2D(filters=32, kernel_size=(3,2), padding='valid', activation='elu')(tensor)
     tensor = Conv2D(filters=32, kernel_size=1, padding='valid', activation='elu')(tensor)
     tensor = BatchNormalization()(tensor)
     tensor = MaxPooling2D(pool_size=2)(tensor)
+
     tensor1_shape = K.int_shape(tensor)[1:-1]+(label_count,)
     tensor1 = Dense(product(tensor1_shape), activation='elu')(tensor0)
     tensor1 = Reshape(tensor1_shape)(tensor1)
     tensor = Concatenate(axis=3)([tensor,tensor1])
+
     tensor = Conv2D(filters=64, kernel_size=1, padding='valid', activation='elu')(tensor)
     tensor = Conv2D(filters=64, kernel_size=2, padding='valid', activation='elu')(tensor)
     tensor = Conv2D(filters=64, kernel_size=1, padding='valid', activation='elu')(tensor)
     tensor = BatchNormalization()(tensor)
     tensor = MaxPooling2D(pool_size=2)(tensor)
+
     tensor1_shape = K.int_shape(tensor)[1:-1]+(label_count,)
     tensor1 = Dense(product(tensor1_shape), activation='elu')(tensor0)
     tensor1 = Reshape(tensor1_shape)(tensor1)
     tensor = Concatenate(axis=3)([tensor,tensor1])
+
     tensor = Conv2D(filters=128, kernel_size=1, padding='valid', activation='elu')(tensor)
     tensor = Conv2D(filters=128, kernel_size=2, padding='valid', activation='elu')(tensor)
     tensor = Conv2D(filters=128, kernel_size=1, padding='valid', activation='elu')(tensor)
     tensor = BatchNormalization()(tensor)
     tensor = MaxPooling2D(pool_size=2)(tensor)
+
     tensor1_shape = K.int_shape(tensor)[1:-1]+(label_count,)
     tensor1 = Dense(product(tensor1_shape), activation='elu')(tensor0)
     tensor1 = Reshape(tensor1_shape)(tensor1)
     tensor = Concatenate(axis=3)([tensor,tensor1])
+
     tensor = Conv2D(filters=256, kernel_size=1, padding='valid', activation='elu')(tensor)
     tensor = Conv2D(filters=256, kernel_size=3, padding='valid', activation='elu')(tensor)
     tensor = Conv2D(filters=256, kernel_size=1, padding='valid', activation='elu')(tensor)
     tensor = BatchNormalization()(tensor)
     tensor = MaxPooling2D(pool_size=2)(tensor)
+
     tensor1_shape = K.int_shape(tensor)[1:-1]+(label_count,)
     tensor1 = Dense(product(tensor1_shape), activation='elu')(tensor0)
     tensor1 = Reshape(tensor1_shape)(tensor1)
@@ -69,6 +78,7 @@ def create_model(label_count):
     tensor = Conv2D(filters=256, kernel_size=1, padding='valid', activation='elu')(tensor)
     tensor = GlobalAveragePooling2D()(tensor)
     tensor = BatchNormalization()(tensor)
+
     tensor = Dropout(2-PHI)(tensor)
     tensor = Dense(256, activation='elu')(tensor)
     tensor = BatchNormalization()(tensor)
@@ -80,7 +90,9 @@ def create_model(label_count):
     tensor = BatchNormalization()(tensor)
     tensor = Dropout(2-PHI)(tensor)
     tensor = Dense(label_count, kernel_regularizer=regularizers.l1(0.01/(label_count*256)))(tensor)
+
     tensor = Activation('softmax')(tensor)
+
     tensor_out = tensor
 
     model = Model(inputs=tensor_in, outputs=tensor_out)

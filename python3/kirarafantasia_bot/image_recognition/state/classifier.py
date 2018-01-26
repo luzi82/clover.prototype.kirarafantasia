@@ -36,9 +36,6 @@ class StateClassifier:
             model.load_weights(weight_path)
             self.model_list.append(model)
 
-        xy_layer = clover.image_recognition.xy_layer(WIDTH,HEIGHT)
-        self.xy_layerx1 = np.reshape(xy_layer,(1,HEIGHT,WIDTH,2))
-
     def get(self, img):
         assert(np.amax(img)<=1)
         assert(np.amin(img)>=-1)
@@ -49,7 +46,7 @@ class StateClassifier:
         img = preprocess_img(img)
         score_list_list_list = np.zeros((self.mirror_count,1,self.label_name_count))
         for mirror_idx in range(self.mirror_count):
-            p_list_list = self.model_list[mirror_idx].predict([np.expand_dims(img, axis=0),self.xy_layerx1])
+            p_list_list = self.model_list[mirror_idx].predict(np.expand_dims(img, axis=0))
             assert(p_list_list.shape==(1,self.label_name_count))
             score_list_list_list[mirror_idx] = p_list_list
 

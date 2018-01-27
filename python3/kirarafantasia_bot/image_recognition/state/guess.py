@@ -56,7 +56,7 @@ if __name__ == '__main__':
         _, img_fn_t = os.path.split(img_fn)
         img = classifier.load_img(img_fn)
         label, _, perfect = clr.get(img)
-        if (args.disagree) and (label==known_dict[img_fn]):
+        if (args.disagree) and (label==known_dict[img_fn]) and perfect:
             continue
         if (args.imperfect_only) and perfect:
             continue

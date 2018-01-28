@@ -13,6 +13,7 @@ import subprocess
 import gc
 from . import setting
 from . import train
+import kirarafantasia_bot.image_recognition.state as ir_state
 
 save_data_set = train.save_data_set
 sample_list_to_data_set = train.sample_list_to_data_set
@@ -33,13 +34,7 @@ if __name__ == '__main__':
     epochs          = train_prepare_data['epochs']
 
     # get label list
-    label_state_path = os.path.join('image_recognition','label','state')
-    label_name_list = os.listdir(label_state_path)
-    label_name_list = filter(lambda v:os.path.isfile(os.path.join(label_state_path,v)),label_name_list)
-    label_name_list = filter(lambda v:v.endswith('.txt'),label_name_list)
-    label_name_list = [ i[:-4] for i in label_name_list]
-    label_name_list = sorted(label_name_list)
-    
+    label_name_list = ir_state.get_label_list()
     label_count = len(label_name_list)
 
     # fast quit if summaryonly
@@ -57,7 +52,7 @@ if __name__ == '__main__':
     sample_list = []
     for label_idx in range(label_count):
         label_name = label_name_list[label_idx]
-        img_fn_list_fn = os.path.join(label_state_path,'{}.txt'.format(label_name))
+        img_fn_list_fn = os.path.join(ir_state.LABEL_STATE_PATH,'{}.txt'.format(label_name))
         with open(img_fn_list_fn, mode='rt', encoding='utf-8') as fin:
             img_fn_list = fin.readlines()
         img_fn_list = [ img_fn.strip() for img_fn in img_fn_list ]
@@ -65,7 +60,7 @@ if __name__ == '__main__':
 
     # randomize sample order
     random.shuffle(sample_list)
-    #sample_list = sample_list[:100]
+    #sample_list = sample_list[:10]
 
     # clean dir
     clover.common.reset_dir(os.path.join('image_recognition','model','state'))

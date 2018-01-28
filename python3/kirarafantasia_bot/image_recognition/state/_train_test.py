@@ -14,6 +14,7 @@ import math
 import time
 import subprocess
 from . import train as train
+import clover.image_recognition
 
 WIDTH  = model_setting.WIDTH
 HEIGHT = model_setting.HEIGHT
@@ -39,7 +40,11 @@ if __name__ == '__main__':
 
     test_sample_list        = sample_list[:test_sample_count]
     test_img_list,  test_label_onehot_list  = sample_list_to_data_set(test_sample_list ,label_count)
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> origin/v00a
     model = model_setting.create_model(label_count)
 
     for mirror_idx in range(mirror_count):

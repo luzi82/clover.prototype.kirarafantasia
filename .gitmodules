@@ -1,3 +1,6 @@
 [submodule "dependency/FFmpeg"]
 	path = dependency/FFmpeg
 	url = git@github.com:luzi82/FFmpeg.git
+[submodule "dependency/captcha"]
+	path = dependency/captcha
+	url = git@github.com:luzi82/captcha.git

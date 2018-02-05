@@ -11,6 +11,8 @@ class TextImageGenerator(keras.callbacks.Callback):
                  char_set,
                  max_word_len):
 
+        assert(img_w2>char_w0*img_h2/img_h0*max_word_len)
+
         self.minibatch_size = minibatch_size
         self.img_w0 = round(img_w2 * img_h0 / img_h2)
         self.img_h0 = img_h0
@@ -47,6 +49,8 @@ class TextImageGenerator(keras.callbacks.Callback):
             img = np.asarray(img,dtype=np.float32)
             img = ((img/255)*2)-1
             assert(img.shape==(h0,w0,3))
+            assert(np.amax(img)<=1)
+            assert(np.amin(img)>=-1)
             
             h1 = random.randint(self.img_h1_min, self.img_h1_max)
             w1 = round(w0*h1/h0)
@@ -87,6 +91,7 @@ class TextImageGenerator(keras.callbacks.Callback):
             ret = self.get_batch(self.minibatch_size)
             yield ret
 
+OUTPUT_DIR = os.path.join('image_recognition','model','ocr')
 
 if __name__ == '__main__':
     import argparse
@@ -95,13 +100,19 @@ if __name__ == '__main__':
     parser.add_argument('epochs', type=int, help="epochs")
     args = parser.parse_args()
     
+    timestamp = str(int(time.time()))
     minibatch_size = 32
     img_h = 16
     img_w = img_h*12
+    train_count = 3200
+    val_count = 320
+    output_dir = os.path.join(OUTPUT_DIR, timestamp)
     
     img_gen = TextImageGenerator(
         minibatch_size=minibatch_size,
-        img_w=img_w, img_h=img_h,
+        img_h0=40, char_w0=20,
+        img_h1_min=6, img_h1_max=40,
+        img_w2=100, img_h2=16, img_w2b=8,
         char_set='0123456789',
         max_word_len=10
     )

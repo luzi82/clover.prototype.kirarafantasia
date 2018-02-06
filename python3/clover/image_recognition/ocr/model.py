@@ -15,7 +15,7 @@ from keras import backend as K
 import numpy as np
 
 def tensor_in_out(label_count,input_shape):
-    tensor_in = Input(shape=input_shape, name='input_img')
+    tensor_in = Input(shape=input_shape, name='the_input')
 
     tensor = tensor_in
 

@@ -2,7 +2,7 @@ import captcha.image as captcha_image
 import os
 from . import draw_text
 
-class TextImageGenerator(keras.callbacks.Callback):
+class TextImageGenerator():
 
     def __init__(self, minibatch_size,
                  img_h0, char_w0,
@@ -25,9 +25,6 @@ class TextImageGenerator(keras.callbacks.Callback):
         self.blank_label = len(char_set)
         self.max_word_len = max_word_len
         self.draw_text = draw_text.DrawText()
-
-    def get_output_size(self):
-        return len(char_set) + 1
 
     def get_batch(self, size):
         X_data = np.zeros([size, self.img_w2+self.img_w2b*2, self.img_h2, 4])
@@ -73,7 +70,7 @@ class TextImageGenerator(keras.callbacks.Callback):
             label_length[i] = word_len
             source_str.append(word)
         inputs = {
-            'input_img': X_data,
+            'the_input': X_data,
             'the_labels': labels,
             'input_length': input_length,
             'label_length': label_length,
@@ -91,6 +88,12 @@ class TextImageGenerator(keras.callbacks.Callback):
             ret = self.get_batch(self.minibatch_size)
             yield ret
 
+    def get_label_count(self):
+        return len(char_set) + 1
+
+    def get_model_input_shape(self):
+        return (self.img_w2+self.img_w2b*2, self.img_h2, 4)
+
 OUTPUT_DIR = os.path.join('image_recognition','model','ocr')
 
 if __name__ == '__main__':
@@ -102,18 +105,44 @@ if __name__ == '__main__':
     
     timestamp = str(int(time.time()))
     minibatch_size = 32
-    img_h = 16
-    img_w = img_h*12
     train_count = 3200
     val_count = 320
     output_dir = os.path.join(OUTPUT_DIR, timestamp)
+    char_set='0123456789'
     
     img_gen = TextImageGenerator(
         minibatch_size=minibatch_size,
         img_h0=40, char_w0=20,
         img_h1_min=6, img_h1_max=40,
         img_w2=100, img_h2=16, img_w2b=8,
-        char_set='0123456789',
+        char_set=char_set,
         max_word_len=10
     )
     
+    tensor_in, tensor_out = model.tensor_in_out(img_gen.get_label_count(),img_gen.get_model_input_shape())
+
+    labels = Input(name='the_labels', shape=[img_gen.absolute_max_string_len], dtype='float32')
+    input_length = Input(name='input_length', shape=[1], dtype='int64')
+    label_length = Input(name='label_length', shape=[1], dtype='int64')
+
+    loss_out = Lambda(ctc_lambda_func, output_shape=(1,), name='ctc')([y_pred, labels, input_length, label_length])
+
+    sgd = SGD(lr=0.02, decay=1e-6, momentum=0.9, nesterov=True, clipnorm=5)
+
+    model = Model(inputs=[input_data, labels, input_length, label_length], outputs=loss_out)
+
+    # the loss calc occurs elsewhere, so use a dummy lambda func for the loss
+    model.compile(loss={'ctc': lambda y_true, y_pred: y_pred}, optimizer=sgd)
+
+    model_checkpoint = ModelCheckpoint(filepath=os.path.join(output_dir,'weight.{epoch:06d}.hdf5'))
+    model_best = ModelCheckpoint(filepath=os.path.join(output_dir,'weight.best.hdf5'))
+    csv_logger = CSVLogger(filename=os.path.join(output_dir,'log.csv'))
+
+    model.fit_generator(generator=img_gen.next_batch(),
+                        steps_per_epoch=train_count // minibatch_size,
+                        epochs=args.epochs,
+                        validation_data=img_gen.next_batch(),
+                        validation_steps=val_count // minibatch_size,
+                        callbacks=[model_checkpoint, model_best, csv_logger],
+                        verbose=verbose
+                        )

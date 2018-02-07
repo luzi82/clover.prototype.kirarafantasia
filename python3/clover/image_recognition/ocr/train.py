@@ -52,6 +52,7 @@ class TextImageGenerator():
 
             h0 = self.img_h0
             w0 = self.char_w0 * word_len
+            w0 = max(w0, self.char_w0)
             w0 = min(w0, self.img_w0)
             w0 = random.randint(w0, self.img_w0)
             img = self.draw_text.create_image(word, w0, h0)
@@ -77,9 +78,13 @@ class TextImageGenerator():
 
             X_data[i, self.img_w2b:self.img_w2b+w2, :, 0:3] = img
             X_data[i, self.img_w2b:self.img_w2b+w2, :, 3] = 1
-            labels[i, 0:word_len] = text_to_labels(word, self.char_set)
             input_length[i] = w2
-            label_length[i] = word_len
+            if word_len > 0:
+                labels[i, 0:word_len] = text_to_labels(word, self.char_set)
+                label_length[i] = word_len
+            else:
+                labels[i, 0] = self.blank_label
+                label_length[i] = 1
             #source_str.append(word)
         inputs = {
             'the_input': X_data,
@@ -101,9 +106,13 @@ class TextImageGenerator():
     def get_model_input_shape(self):
         return (self.img_w2+self.img_w2b*2, self.img_h2, 4)
 
+    def get_label_shape(self):
+        return (self.max_word_len*2,)
+
 def ctc_lambda_func_factory(img_w2b):
     def ctc_lambda_func(args):
         y_pred, labels, input_length, label_length = args
+        print('TVXCCJUJHD {}'.format(K.int_shape(y_pred)))
         y_pred = y_pred[:, img_w2b:-img_w2b, :]
         return K.ctc_batch_cost(labels, y_pred, input_length, label_length)
     return ctc_lambda_func
@@ -141,10 +150,13 @@ if __name__ == '__main__':
         char_set=char_set,
         max_word_len=max_word_len
     )
+    print('IOHDXGVOYU {}'.format(img_gen.get_model_input_shape()))
     
     tensor_in, tensor_out = model.tensor_in_out(img_gen.get_label_count(),img_gen.get_model_input_shape())
+    print('WDMZPOLQBZ {}'.format(K.int_shape(tensor_in)))
+    print('WGKAWEBEDM {}'.format(K.int_shape(tensor_out)))
 
-    labels = Input(name='the_labels', shape=[max_word_len], dtype='float32')
+    labels = Input(name='the_labels', shape=img_gen.get_label_shape(), dtype='float32')
     input_length = Input(name='input_length', shape=[1], dtype='int64')
     label_length = Input(name='label_length', shape=[1], dtype='int64')
 
@@ -167,5 +179,5 @@ if __name__ == '__main__':
                         validation_data=img_gen.next_batch(),
                         validation_steps=val_count // minibatch_size,
                         callbacks=[model_checkpoint, model_best, csv_logger],
-                        verbose=2
+                        verbose=1
                         )

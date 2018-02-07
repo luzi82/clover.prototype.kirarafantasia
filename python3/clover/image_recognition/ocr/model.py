@@ -19,8 +19,6 @@ def tensor_in_out(label_count,input_shape):
 
     tensor = tensor_in
 
-    tensor = Permute((2,1,3), name='r')(tensor)
-
     tensor = Conv2D(filters=32, kernel_size=1,     padding='same', activation='elu', name='a0')(tensor)
     tensor = Conv2D(filters=32, kernel_size=(5,5), padding='same', activation='elu', name='a1')(tensor)
     tensor = Conv2D(filters=32, kernel_size=1,     padding='same', activation='elu', name='a2')(tensor)
@@ -70,6 +68,6 @@ def tensor_in_out(label_count,input_shape):
     return tensor_in, tensor_out
 
 if __name__ == '__main__':
-    tensor_in, tensor_out = tensor_in_out(11,(16,160,4))
+    tensor_in, tensor_out = tensor_in_out(11,(160,16,4))
     model = Model(inputs=tensor_in, outputs=tensor_out)
     model.summary()

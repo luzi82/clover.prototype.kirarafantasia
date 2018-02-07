@@ -21,6 +21,11 @@ class DrawText:
 
     def __init__(self):
         self.image_captcha = ImageCaptcha(fonts=get_font_list())
+        self.image_captcha._enable_back_text = False
+        self.image_captcha._enable_background_noise = False
+        self.image_captcha._enable_noise_bg = False
+        self.image_captcha._enable_noise_dot = False
+        self.image_captcha._enable_noise_curve = False
         self.lock = threading.Lock()
 
     def create_image(self, text, width, height):

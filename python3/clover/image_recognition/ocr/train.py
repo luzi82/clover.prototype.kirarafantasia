@@ -58,6 +58,8 @@ class TextImageGenerator():
             img = self.draw_text.create_image(word, w0, h0)
             img = np.asarray(img,dtype=np.float32)
             img = ((img/255)*2)-1
+            if(img.shape!=(h0,w0,3)):
+                print('GBMQHQUQZM {}'.format(img.shape))
             assert(img.shape==(h0,w0,3))
             assert(np.amax(img)<=1)
             assert(np.amin(img)>=-1)

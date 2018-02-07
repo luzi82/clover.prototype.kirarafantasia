@@ -2,6 +2,7 @@ from captcha.image import ImageCaptcha
 import os
 import argparse
 import cv2
+import threading
 
 def get_font_list():
     font_list = []
@@ -20,10 +21,12 @@ class DrawText:
 
     def __init__(self):
         self.image_captcha = ImageCaptcha(fonts=get_font_list())
+        self.lock = threading.Lock()
 
     def create_image(self, text, width, height):
-        self.image_captcha.set_size(width, height)
-        return self.image_captcha.generate_image(text)
+        with self.lock:
+            self.image_captcha.set_size(width, height)
+            return self.image_captcha.generate_image(text)
 
 if __name__ == '__main__':
     import pylab

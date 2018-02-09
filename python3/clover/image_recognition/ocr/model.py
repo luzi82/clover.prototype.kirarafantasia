@@ -51,13 +51,10 @@ def tensor_in_out(label_count,input_shape):
     #tensor = Dropout(2-PHI, name='c24')(tensor)
 
     tensor = Dense(256, activation='elu', name='d0')(tensor)
-    tensor = BatchNormalization(name='d1')(tensor)
     #tensor = Dropout(2-PHI, name='d2')(tensor)
     tensor = Dense(256, activation='elu', name='d3')(tensor)
-    tensor = BatchNormalization(name='d4')(tensor)
     #tensor = Dropout(2-PHI, name='d5')(tensor)
     tensor = Dense(256, activation='elu', name='d6')(tensor)
-    tensor = BatchNormalization(name='d7')(tensor)
     #tensor = Dropout(2-PHI, name='d8')(tensor)
     #tensor = Dense(label_count, activity_regularizer=regularizers.l1(0.01/(label_count*input_shape[1])), name='d9')(tensor)
     #tensor = Dense(label_count, activity_regularizer=regularizers.l1(0.01), name='d9')(tensor)

@@ -134,10 +134,10 @@ if __name__ == '__main__':
     parser.add_argument('epochs', type=int, help="epochs")
     args = parser.parse_args()
 
-    output_dir = OUTPUT_DIR
+    timestamp = str(int(time.time()))
+    output_dir = os.path.join(OUTPUT_DIR,timestamp)
     clover.common.reset_dir(output_dir)
 
-    timestamp = str(int(time.time()))
     minibatch_size = 32
     train_count = 3200
     val_count = 320

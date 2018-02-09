@@ -5,7 +5,7 @@ import random
 import cv2
 import numpy as np
 #from keras.utils import np_utils
-from keras.callbacks import ModelCheckpoint
+from keras.callbacks import ModelCheckpoint, CSVLogger
 import json
 from . import model as model_setting
 #from . import classifier
@@ -42,6 +42,7 @@ if __name__ == '__main__':
     sample_list = train_unit_data['sample_list']
     train_valid_sample_data_dir_path = train_unit_data['train_valid_sample_data_dir_path']
     hdf5_fn = mirror_data['hdf5_fn']
+    csvlog_fn = mirror_data['csvlog_fn']
 
     valid_start = mirror_data['valid_start']
     valid_end   = mirror_data['valid_end']
@@ -101,6 +102,7 @@ if __name__ == '__main__':
     model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
         
     checkpointer = ModelCheckpoint(filepath=hdf5_fn, verbose=1, save_best_only=True)
+    csv_logger = CSVLogger(filename=csvlog_fn)
     
     #train_turn_count = math.floor(len(train_sample_list)**(1/3))
     #batch_size = math.ceil(len(train_sample_list)/train_turn_count)

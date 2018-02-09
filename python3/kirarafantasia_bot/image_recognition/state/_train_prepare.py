@@ -98,14 +98,16 @@ if __name__ == '__main__':
     for mirror_idx in range(mirror_count):
 
         hdf5_fn = os.path.join('image_recognition','model','state','weight.{}.hdf5'.format(mirror_idx))
+        csvlog_fn = os.path.join('image_recognition','model','state','log.{}.csv'.format(mirror_idx))
 
         valid_start = int(train_valid_sample_count*(mirror_idx+0)/float(mirror_count))
         valid_end   = int(train_valid_sample_count*(mirror_idx+1)/float(mirror_count))
         
         mirror_data = {
-            'hdf5_fn': hdf5_fn,
+            'hdf5_fn':     hdf5_fn,
             'valid_start': valid_start,
-            'valid_end': valid_end,
+            'valid_end':   valid_end,
+            'csvlog_fn':   csvlog_fn,
         }
         train_unit_data['mirror_data_list'].append(mirror_data)
 

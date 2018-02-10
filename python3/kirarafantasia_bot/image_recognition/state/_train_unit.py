@@ -111,4 +111,4 @@ if __name__ == '__main__':
     epochs = train_unit_data['epochs']
     model.fit([train_img_list, train_xy_layer], train_label_onehot_list,
         validation_data=([valid_img_list, valid_xy_layer], valid_label_onehot_list),
-        epochs=epochs, batch_size=batch_size, callbacks=[checkpointer], verbose=1)
+        epochs=epochs, batch_size=batch_size, callbacks=[checkpointer, csv_logger], verbose=1)
